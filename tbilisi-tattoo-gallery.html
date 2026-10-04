@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" class="intro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tbilisi Tattoo Gallery</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Archivo:wght@400;500&display=swap">
+<style>
+:root{--bg:#0E0E0E;--fg:#EDE8DC;--dim:rgba(237,232,220,.62);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:Archivo,system-ui,sans-serif;overflow-x:hidden;transition:background .9s ease,color .9s ease}
+body[data-mood=bone]{--bg:#EDE8DC;--fg:#0E0E0E;--dim:rgba(14,14,14,.62)}
+h1,h2,h3,.say,.step b{font-family:Syne,"Helvetica Neue",Arial,sans-serif;font-weight:800;font-style:normal;margin:0;line-height:.98;letter-spacing:-.035em}
+h1{font-size:clamp(2.8rem,9.5vw,8rem)}
+h1 i{display:block;font-style:normal;font-weight:500}
+h2{font-size:clamp(2.6rem,9vw,7.5rem)}
+p{margin:1.2rem 0 0;color:var(--dim);max-width:30ch;line-height:1.55;font-size:1.1rem}
+.stage{height:260vh;position:relative}
+.stage.one{height:100vh}
+.sticky{position:sticky;top:0;height:100vh;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0 5vw;overflow:hidden}
+.flip .sticky{flex-direction:row-reverse}
+.sticky>div{position:relative;z-index:3}
+.frames{position:relative;flex:none;width:min(48vw,70vh);height:84vh;z-index:1}
+.frame{position:absolute;width:var(--w);aspect-ratio:3/4;border:1px solid currentColor;will-change:transform}
+.frame span{position:absolute;left:0;top:calc(100% + .5rem);font-size:.8rem;color:var(--dim);white-space:nowrap}
+.one .sticky{flex-direction:column;align-items:flex-start;justify-content:center}
+.needle{position:absolute;left:0;bottom:12vh;width:100%;height:auto}
+.needle path{fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 3.4s .3s ease forwards}
+.needle path:nth-child(2){animation-delay:.8s}.needle path:nth-child(n+3){animation-duration:1.4s;animation-delay:2.2s}
+.needle .swash{fill:currentColor;stroke:none;stroke-dasharray:none;stroke-dashoffset:0;clip-path:inset(0 100% 0 0);animation:reveal 2.6s .3s cubic-bezier(.6,0,.2,1) forwards}
+.needle circle{fill:currentColor;opacity:0;animation:pop .4s forwards}
+@keyframes reveal{to{clip-path:inset(0 0 0 0)}}@keyframes pop{to{opacity:1}}
+@keyframes draw{to{stroke-dashoffset:0}}
+.cue{position:absolute;left:5vw;bottom:5vh;font-size:.95rem;color:var(--dim)}
+.chips{display:flex;flex-wrap:wrap;gap:.6rem;margin:1.8rem 0;max-width:40rem}
+.chips button,.go{font:inherit;color:inherit;background:none;border:1px solid currentColor;border-radius:0;padding:.7rem 1.2rem;cursor:pointer;transition:background .2s,color .2s}
+.chips button[aria-pressed=true],.go:hover{background:var(--fg);color:var(--bg)}
+.go{padding:1rem 2rem;font-size:1.1rem;background:var(--fg);color:var(--bg)}
+.go:hover{background:transparent;color:var(--fg)}
+button:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+#dragon{transition:opacity .7s ease;position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:40;overflow:visible;color:#fff;mix-blend-mode:difference}
+.say{font-size:clamp(1.7rem,4.6vw,4rem);max-width:20em;font-weight:700}
+.say span{opacity:.15;transition:opacity .4s}
+.steps{display:grid}
+.step{grid-area:1/1;display:flex;gap:1.6rem;align-items:flex-start;opacity:0}
+.step b{font-size:clamp(4rem,12vw,9rem)}
+h3{font-size:clamp(2rem,5vw,3.6rem)}
+.small{font-size:clamp(2.6rem,8vw,6rem)!important}
+footer{position:absolute;left:5vw;bottom:4vh;font-size:.9rem;color:var(--dim)}
+.horiz .sticky,.zoom .sticky,.stack .sticky,.spot .sticky{display:block}
+.bgh{position:absolute;left:5vw;top:8vh;z-index:3;mix-blend-mode:difference;color:#fff;font-size:clamp(2.8rem,11vw,9rem)}
+.cap{position:absolute;left:5vw;bottom:6vh;z-index:3;max-width:30ch}
+.track{position:absolute;left:5vw;top:50%;margin-top:-31vh;display:flex;gap:5vw;z-index:1;will-change:transform}
+.track .frame{position:relative;left:auto;top:auto;width:auto;height:62vh;flex:none}
+.track .frame:nth-child(even){margin-top:9vh}
+.zoom .frame{left:50%;top:50%;width:auto;height:70vh;z-index:1}
+.zoom .frame span{display:none}
+.stack .frame{left:50%;top:50%;width:auto;height:58vh;z-index:1}
+.field{position:absolute;inset:0;-webkit-mask-image:radial-gradient(circle 24vmax at var(--mx,50%) var(--my,50%),#000 0,#000 35%,transparent 100%);mask-image:radial-gradient(circle 24vmax at var(--mx,50%) var(--my,50%),#000 0,#000 35%,transparent 100%)}
+@media(pointer:coarse){.field{-webkit-mask-image:none;mask-image:none}}
+.stage.rest{height:75vh;display:flex;align-items:center;padding:0 5vw}
+.rest span{display:flex;align-items:center;gap:1.2rem;width:100%;font-family:Syne,Arial,sans-serif;font-weight:700;font-size:clamp(1.1rem,2.6vw,1.8rem);color:var(--dim)}
+.rest span:after{content:"";height:1px;background:var(--dim);flex:1}
+#veil{position:fixed;inset:0;background:#fff;z-index:39}
+html.intro{overflow:hidden}
+canvas{mix-blend-mode:difference}
+canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+.pen{position:fixed;left:0;top:0;z-index:60;pointer-events:none;color:#fff;mix-blend-mode:difference;display:none;will-change:transform}
+.pen path{fill:#000;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
+@media(pointer:fine){body,button{cursor:none}.pen{display:block}}
+@media(max-width:700px){.sticky,.flip .sticky{flex-direction:column;justify-content:center;align-items:flex-start}.frames{width:86vw;height:44vh}}
+@media(prefers-reduced-motion:reduce){.needle .swash{animation:none;clip-path:none}.needle circle{animation:none;opacity:1}.needle path{animation:none;stroke-dashoffset:0}body{transition:none}}
+</style>
+</head>
+<body data-mood="ink">
+<canvas id="ink"></canvas>
+<div id="veil"></div>
+<svg id="dragon" aria-hidden="true"><g id="world"><g id="body" style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round"><path/><path/><path/><path/></g>
+<g id="head"><g style="fill:currentColor"><path d="M-8 -12C14 -22 46 -20 72 -7C80 -3 82 3 73 6C60 5 48 9 30 13C14 17 0 13 -8 11Z"/><path d="M20 12C40 15 58 15 72 10C65 20 44 24 24 19Z"/><path d="M10 -16C0 -32 -14 -40 -32 -44C-16 -34 -8 -26 -2 -14Z"/><path d="M26 -17C22 -32 14 -44 0 -54C10 -40 14 -30 18 -14Z"/><path d="M-8 -9C-22 -22 -36 -15 -50 -29C-40 -9 -30 -2 -10 3Z"/><path d="M-8 2C-24 6 -38 2 -52 14C-38 18 -24 16 -8 11Z"/></g>
+<g style="fill:#000"><circle cx="30" cy="-5" r="3.2"/><path d="M44 8l4 9l4-9Z"/><path d="M58 8l3 8l3-8Z"/></g>
+<g style="fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round"><path d="M72 -3C102 -16 122 -4 144 -24"/><path d="M72 4C102 16 120 10 142 28"/></g></g></g></svg>
+<svg class="pen" id="pen" width="56" height="56" viewBox="0 0 56 56" aria-hidden="true"><path d="M3 53L12 38L18 44Z"/><path d="M12 38L36 14L46 24L18 44Z"/><path d="M36 14L42 8L52 18L46 24Z"/></svg>
+
+<section class="stage one" data-mood="ink">
+  <div class="sticky">
+    <h1>Permanent.<i>Choose well.</i></h1>
+    <p>Browse Tbilisi's tattoo artists by style and mood.</p>
+    
+    <span class="cue">Scroll</span>
+  </div>
+</section>
+
+<section class="stage" id="say" data-mood="ink" style="height:260vh"><div class="sticky" style="justify-content:flex-start"><div class="say" id="sayText" data-text="Every tattoo starts with a conversation. Find the artist whose work already speaks your language, then tell them what you want to wear forever."></div></div></section>
+<section class="stage" data-v="drift" data-mood="bone"><div class="sticky"><div><h2>Fine<br>line</h2><p>Thin, exact and quiet. Single-needle work that sits close to the skin.</p></div><div class="frames"><div class="frame" data-s="30" style="--w:52%;left:30%;top:2%"></div><div class="frame" data-s="-20" style="--w:40%;left:0%;top:38%"></div><div class="frame" data-s="50" style="--w:44%;left:54%;top:48%"></div></div></div></section>
+<section class="stage rest" data-mood="ink"><span>Next: Old school</span></section>
+<section class="stage horiz" data-v="horiz" data-mood="ink" style="height:340vh"><div class="sticky"><h2 class="bgh">Old<br>school</h2><p class="cap">Bold outlines, limited colors, and flash that has aged well for a century.</p><div class="track"><div class="frame"></div><div class="frame"></div><div class="frame"></div><div class="frame"></div><div class="frame"></div></div></div></section>
+<section class="stage rest" data-mood="bone"><span>Next: Black work</span></section>
+<section class="stage zoom" data-v="zoom" data-mood="bone" style="height:280vh"><div class="sticky"><div class="frame"></div><h2 class="bgh" style="top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">Black<br>work</h2><p class="cap">Solid black, hard contrast, ornament and geometry.</p></div></section>
+<section class="stage rest" data-mood="ink"><span>Next: Japanese</span></section>
+<section class="stage stack" data-v="stack" data-mood="ink" style="height:340vh"><div class="sticky"><h2 class="bgh">Japanese</h2><p class="cap">Dragons, koi and waves. Large pieces that follow the body.</p><div class="frame"></div><div class="frame"></div><div class="frame"></div><div class="frame"></div></div></section>
+<section class="stage rest" data-mood="bone"><span>Next: Realism</span></section>
+<section class="stage spot" data-v="spot" data-mood="bone" style="height:260vh"><div class="sticky"><div class="field"><div class="frame" style="--w:16%;left:8%;top:14%"></div><div class="frame" style="--w:20%;left:38%;top:8%"></div><div class="frame" style="--w:15%;left:70%;top:18%"></div><div class="frame" style="--w:18%;left:22%;top:52%"></div><div class="frame" style="--w:17%;left:60%;top:50%"></div></div><h2 class="bgh">Realism</h2><p class="cap">Move your pen over the wall to uncover the work.</p></div></section>
+<section class="stage rest" data-mood="ink"><span>Next: Dot work</span></section>
+<section class="stage horiz" data-v="horiz" data-mood="ink" style="height:340vh"><div class="sticky"><h2 class="bgh">Dot<br>work</h2><p class="cap">Images built from thousands of single dots. Patient and geometric.</p><div class="track"><div class="frame"></div><div class="frame"></div><div class="frame"></div><div class="frame"></div><div class="frame"></div></div></div></section>
+<section class="stage rest" data-mood="bone"><span>Next: Water color</span></section>
+<section class="stage zoom" data-v="zoom" data-mood="bone" style="height:280vh"><div class="sticky"><div class="frame"></div><h2 class="bgh" style="top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">Water<br>color</h2><p class="cap">Soft color washes with no hard outlines, like a painting on skin.</p></div></section>
+<section class="stage rest" data-mood="ink"><span>Next: How it works</span></section>
+<section class="stage" id="how" data-mood="ink" style="height:340vh"><div class="sticky" style="flex-direction:column;align-items:flex-start;justify-content:center"><h2 class="small" style="margin-bottom:2rem">How it works</h2><div class="steps">
+<div class="step"><b>1</b><div><h3>Find your vibe</h3><p>Filter by style and mood until the work feels like you.</p></div></div>
+<div class="step"><b>2</b><div><h3>Tell the artist your idea</h3><p>Send a short brief. They reply with a sketch, not a quote.</p></div></div>
+<div class="step"><b>3</b><div><h3>Love it? Book it</h3><p>Approve the sketch, pick a date, and leave a deposit.</p></div></div></div></div></section>
+<section class="stage one" data-mood="bone"><div class="sticky"><h2>Are you<br>an artist?</h2><p>Put your portfolio on the wall. Clients find you by style, message you, and book.</p><button class="go" style="margin-top:1.6rem">Join as an artist</button></div></section>
+<section class="stage one" data-mood="ink"><div class="sticky">
+    <h2>Pick your<br>style</h2>
+    <div class="chips" id="chips">
+      <button aria-pressed="false">Fine line</button><button aria-pressed="false">Old school</button><button aria-pressed="false">Blackwork</button><button aria-pressed="false">Japanese</button>
+      <button aria-pressed="false">Realism</button><button aria-pressed="false">Dotwork</button><button aria-pressed="false">Watercolor</button><button aria-pressed="false">Lettering</button>
+    </div>
+    <button class="go" id="go">Explore the gallery</button>
+    <p id="note" hidden>Prototype: the filterable gallery is the next page to build.</p>
+    <footer>Tbilisi, Georgia</footer>
+  </div></section>
+
+<script>
+(function(){
+  [].forEach.call(document.querySelectorAll(".frame"),function(f,i){
+    var t=i%3,s='<svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%"><defs><filter id="k'+i+'" x="-30%" y="-30%" width="160%" height="160%"><feTurbulence type="fractalNoise" baseFrequency="'+(.012+.004*t)+' '+(.03-.005*t)+'" numOctaves="3" seed="'+(i*5+2)+'"/><feDisplacementMap in="SourceGraphic" scale="'+(50+t*10)+'"/></filter></defs><g filter="url(#k'+i+')" fill="currentColor" stroke="currentColor">';
+    if(t==0)s+='<circle cx="150" cy="190" r="95"/><circle cx="150" cy="190" r="125" fill="none" stroke-width="3"/>';
+    else if(t==1)s+='<rect x="50" y="90" width="200" height="26"/><rect x="40" y="160" width="220" height="14"/><rect x="60" y="215" width="180" height="40"/><rect x="50" y="290" width="200" height="8"/>';
+    else s+='<path fill="none" stroke-width="10" d="M30 330C90 230 40 140 150 70S250 150 270 60"/><circle cx="150" cy="210" r="40" fill="none" stroke-width="8"/>';
+    f.innerHTML=s+'</g></svg><span>Artist name, Tbilisi</span>';
+  });
+  (function(){
+    var svg=document.getElementById("dragon"),layers=[].slice.call(document.querySelectorAll("#body path")),world=document.getElementById("world"),head=document.getElementById("head"),veil=document.getElementById("veil");
+    var pts,total,introLen,introIdx,y0,s,vh,W,introP=0,reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+    var WID=[5,10,16,22],FRAC=[1,.7,.45,.22],art=[].slice.call(document.querySelectorAll(".stage[data-v]"));
+    function build(){
+      W=innerWidth;vh=innerHeight;var H=document.documentElement.scrollHeight;
+      y0=vh*.78;s=Math.max(.7,Math.min(1.2,W/1200));pts=[];var len=0,x,y,xe=W*.86;
+      function push(x,y){var q=pts[pts.length-1];if(q)len+=Math.hypot(x-q.x,y-q.y);pts.push({x:x,y:y,l:len})}
+      for(x=-220;x<=xe;x+=8){var u=(x+220)/(xe+220);push(x,y0+55*s*Math.sin(u*9)*(1-u))}
+      introIdx=pts.length-1;introLen=len;
+      var A=W*.38,ph0=Math.acos((xe-W*.5)/A);
+      for(y=y0+8;y<=H+200;y+=8)push(W*.5+A*Math.cos(ph0+(y-y0)/(vh*1.05)*Math.PI*2),y);
+      total=len;var d="M"+pts.map(function(q){return q.x.toFixed(1)+" "+q.y.toFixed(1)}).join("L");
+      layers.forEach(function(l,i){l.setAttribute("d",d);l.style.strokeWidth=WID[i]*s});
+      render();
+    }
+    function at(l){var lo=0,hi=pts.length-1;while(hi-lo>1){var m=(lo+hi)>>1;if(pts[m].l<l)lo=m;else hi=m}return pts[hi]}
+    function render(){
+      var hl=introP*introLen,target=scrollY+vh*.62;
+      if(target>y0){var k=introIdx;while(k<pts.length-1&&pts[k].y<target)k++;hl=Math.max(hl,pts[k].l)}
+      world.setAttribute("transform","translate(0 "+(-scrollY)+")");var seg=Math.min(W*1.1,1200),hide=art.some(function(a){var r=a.getBoundingClientRect();return r.top<vh*.75&&r.bottom>vh*.25});svg.style.opacity=hide?0:1;
+      layers.forEach(function(l,i){var sg=seg*FRAC[i];l.style.strokeDasharray=sg+" "+total;l.style.strokeDashoffset=sg-hl});
+      var p=at(hl),q=at(Math.max(0,hl-40)),a=Math.atan2(p.y-q.y,p.x-q.x),fl=Math.cos(a)<0?-1:1,hs=s*1.5;
+      if(veil){if(introP>=1){veil.remove();veil=null;document.documentElement.classList.remove("intro")}else veil.style.clipPath="inset(0 0 0 "+(p.x+100+introP*W*.14)+"px)"}
+      head.setAttribute("transform","translate("+p.x+" "+p.y+") rotate("+a*180/Math.PI+") scale("+hs+" "+hs*fl+")");
+    }
+    build();var t0=performance.now();
+    (function loop(now){var t=Math.min(1,Math.max(0,(now-t0-600)/3400));introP=reduce?1:1-Math.pow(1-t,3);render();if(introP<1)requestAnimationFrame(loop)})(t0);
+    setTimeout(function(){if(introP<1){introP=1;render()}},6500);
+    var tk=false;addEventListener("scroll",function(){if(!tk){tk=true;requestAnimationFrame(function(){tk=false;render()})}},{passive:true});
+    addEventListener("resize",build);addEventListener("load",build);build();
+  })();
+  var st=document.getElementById("sayText");st.innerHTML=st.dataset.text.split(" ").map(function(w){return "<span>"+w+"</span> "}).join("");document.getElementById("say")._w=[].slice.call(st.querySelectorAll("span"));
+  var V={
+    horiz:function(s,q){var t=s.querySelector(".track");t.style.transform="translateX("+(-(t.scrollWidth-innerWidth*.9)*q)+"px)"},
+    zoom:function(s,q){var f=s.querySelector(".frame");f.style.transform="translate(-50%,-50%) rotate("+(1-q)*-14+"deg) scale("+(.2+Math.pow(q,2.2)*3.6)+")"},
+    stack:function(s,q){[].forEach.call(s.querySelectorAll(".frame"),function(f,i){var t=clamp((q*1.25-i*.25)/.35),e=1-Math.pow(1-t,3);f.style.transform="translate(-50%,-50%) translate("+(i-1.5)*9+"vw,"+(1-e)*110+"vh) rotate("+(i-1.5)*6*e+"deg)"})}
+  };
+  var stages=[].slice.call(document.querySelectorAll(".stage")),tick=false;
+  var clamp=function(v){return Math.max(0,Math.min(1,v))};
+  function update(){
+    tick=false;var vh=innerHeight,mood=stages[0].dataset.mood;
+    stages.forEach(function(s){
+      var r=s.getBoundingClientRect();
+      if(r.top<vh*.5)mood=s.dataset.mood;
+      var span=r.height-vh;if(span<=0)return;
+      var p=clamp(-r.top/span)-.5;
+      if(V[s.dataset.v])V[s.dataset.v](s,clamp((p+.5)/.85));
+      if(s.dataset.v==="drift")[].forEach.call(s.querySelectorAll(".frame"),function(f,i){
+        f.style.transform="translateY("+(-p*f.dataset.s*3)+"px) rotate("+(p*(i-1)*6)+"deg)";
+      });
+    });
+    document.body.dataset.mood=mood;
+    var sy=document.getElementById("say"),ws=sy._w,r1=sy.getBoundingClientRect(),n1=Math.floor(clamp(-r1.top/(r1.height-vh))*1.2*ws.length);
+    ws.forEach(function(w,i){w.style.opacity=i<=n1?1:.15});
+    var hw=document.getElementById("how"),r2=hw.getBoundingClientRect(),p2=clamp(-r2.top/(r2.height-vh));
+    [].forEach.call(hw.querySelectorAll(".step"),function(st,i){var a=clamp(1-Math.abs(p2*3-i-.5)*1.4);st.style.opacity=a;st.style.transform="translateY("+(1-a)*30+"px)"});
+  }
+  addEventListener("scroll",function(){if(!tick){tick=true;requestAnimationFrame(update)}},{passive:true});
+  addEventListener("resize",update);update();
+
+  var cv=document.getElementById("ink"),ctx=cv.getContext("2d"),pen=document.getElementById("pen"),last=null,w,h;
+  function size(){var d=devicePixelRatio||1;w=innerWidth;h=innerHeight;cv.width=w*d;cv.height=h*d;ctx.setTransform(d,0,0,d,0,0)}
+  size();addEventListener("resize",size);
+  addEventListener("pointermove",function(e){
+    var x=e.clientX,y=e.clientY,j=last?(Math.random()-.5)*1.4:0;
+    [].forEach.call(document.querySelectorAll(".field"),function(f){f.style.setProperty("--mx",x+"px");f.style.setProperty("--my",y+"px")});
+    pen.style.transform="translate("+(x-3+j)+"px,"+(y-53+j)+"px)";
+    if(last){
+      var sp=Math.hypot(x-last.x,y-last.y);
+      ctx.strokeStyle="#fff";
+      ctx.lineWidth=Math.max(1.5,6-sp*.06);ctx.lineCap="round";
+      ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(x,y);ctx.stroke();
+    }
+    last={x:x,y:y};
+  });
+  document.addEventListener("mouseleave",function(){last=null});
+  (function fade(){ctx.globalCompositeOperation="destination-out";ctx.fillStyle="rgba(0,0,0,.04)";ctx.fillRect(0,0,w,h);ctx.globalCompositeOperation="source-over";requestAnimationFrame(fade)})();
+
+  document.getElementById("chips").addEventListener("click",function(e){
+    var b=e.target.closest("button");if(b)b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true");
+  });
+  document.getElementById("go").addEventListener("click",function(){document.getElementById("note").hidden=false});
+})();
+</script>
+</body>
+</html>
