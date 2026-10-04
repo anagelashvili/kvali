@@ -8,7 +8,7 @@ type ArtistRow = {
   id: string; slug: string; display_name: string; bio_ka: string | null; bio_en: string | null;
   studio: string | null; city: string; address: string | null; instagram: string | null; phone: string | null;
   price_from: number | null; price_to: number | null; languages: string[]; avatar_path: string | null;
-  status?: string; created_at?: string; updated_at?: string;
+  is_demo?: boolean; status?: string; created_at?: string; updated_at?: string;
 };
 
 export function artist(a: ArtistRow, { own = false } = {}) {
@@ -25,6 +25,7 @@ export function artist(a: ArtistRow, { own = false } = {}) {
     price: { from: a.price_from, to: a.price_to, currency: "GEL" },
     languages: a.languages,
     avatar: publicUrl("avatars", a.avatar_path),
+    demo: a.is_demo ?? false,
     ...(own ? { status: a.status, created_at: a.created_at, updated_at: a.updated_at } : {}),
   };
 }

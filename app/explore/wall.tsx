@@ -14,7 +14,7 @@ type Piece = {
   svg?: string;
   styles: string[];
   feel: (number | null)[]; // 0–1 per slider, null = not set
-  artist: { slug: string; name: string };
+  artist: { slug: string; name: string; demo?: boolean };
   tilt: string;
 };
 
@@ -40,7 +40,7 @@ function toPiece(w: ExploreWork): Piece {
     thumb: w.thumb,
     styles: w.tags,
     feel: FEEL_KEYS.map((k) => (w.feel[k] == null ? null : w.feel[k]! / 100)),
-    artist: { slug: w.artist.slug, name: w.artist.name },
+    artist: { slug: w.artist.slug, name: w.artist.name, demo: w.artist.demo },
     tilt: tiltOf(w.id),
   };
 }
@@ -91,6 +91,7 @@ export function Wall({
 
   const sample = works.length === 0;
   const pieces = useMemo(() => (sample ? samplePieces(styles) : works.map(toPiece)), [sample, works, styles]);
+  const anyDemo = pieces.some((p) => p.artist.demo);
   const styleName = useMemo(() => new Map(styles.map((s) => [s.slug, s.name])), [styles]);
 
   // Score every piece: chips decide in/out, touched sliders decide how close.
@@ -178,7 +179,7 @@ export function Wall({
         </div>
         <div className={css.count}>
           <span>
-            {shown} of {pieces.length} pieces{sample ? " · sample wall until artists join" : ""}
+            {shown} of {pieces.length} pieces{sample ? " · sample wall until artists join" : anyDemo ? " · includes demo artists while real ones join" : ""}
           </span>
           <button
             className={css.clear}

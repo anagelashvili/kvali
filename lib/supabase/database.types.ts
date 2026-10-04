@@ -25,13 +25,13 @@ export type Database = {
           Tables: {
             "artists": {
                   Row: {
-                    "address": string | null,"avatar_path": string | null,"bio_en": string | null,"bio_ka": string | null,"city": string,"created_at": string,"display_name": string,"id": string,"instagram": string | null,"languages": (string)[],"phone": string | null,"price_from": number | null,"price_to": number | null,"slug": string,"status": Database["public"]['Enums']["artist_status"],"studio": string | null,"updated_at": string
+                    "address": string | null,"avatar_path": string | null,"bio_en": string | null,"bio_ka": string | null,"city": string,"created_at": string,"display_name": string,"id": string,"instagram": string | null,"is_demo": boolean,"languages": (string)[],"phone": string | null,"price_from": number | null,"price_to": number | null,"slug": string,"status": Database["public"]['Enums']["artist_status"],"studio": string | null,"updated_at": string
                   }
                   Insert: {
-                    "address"?: string | null,"avatar_path"?: string | null,"bio_en"?: string | null,"bio_ka"?: string | null,"city"?: string,"created_at"?: string,"display_name": string,"id": string,"instagram"?: string | null,"languages"?: (string)[],"phone"?: string | null,"price_from"?: number | null,"price_to"?: number | null,"slug": string,"status"?: Database["public"]['Enums']["artist_status"],"studio"?: string | null,"updated_at"?: string
+                    "address"?: string | null,"avatar_path"?: string | null,"bio_en"?: string | null,"bio_ka"?: string | null,"city"?: string,"created_at"?: string,"display_name": string,"id": string,"instagram"?: string | null,"is_demo"?: boolean,"languages"?: (string)[],"phone"?: string | null,"price_from"?: number | null,"price_to"?: number | null,"slug": string,"status"?: Database["public"]['Enums']["artist_status"],"studio"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "address"?: string | null,"avatar_path"?: string | null,"bio_en"?: string | null,"bio_ka"?: string | null,"city"?: string,"created_at"?: string,"display_name"?: string,"id"?: string,"instagram"?: string | null,"languages"?: (string)[],"phone"?: string | null,"price_from"?: number | null,"price_to"?: number | null,"slug"?: string,"status"?: Database["public"]['Enums']["artist_status"],"studio"?: string | null,"updated_at"?: string
+                    "address"?: string | null,"avatar_path"?: string | null,"bio_en"?: string | null,"bio_ka"?: string | null,"city"?: string,"created_at"?: string,"display_name"?: string,"id"?: string,"instagram"?: string | null,"is_demo"?: boolean,"languages"?: (string)[],"phone"?: string | null,"price_from"?: number | null,"price_to"?: number | null,"slug"?: string,"status"?: Database["public"]['Enums']["artist_status"],"studio"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -51,13 +51,13 @@ export type Database = {
                   ]
                 },"requests": {
                   Row: {
-                    "artist_id": string,"body_view": string,"body_zone": string | null,"contact_email": string | null,"contact_instagram": string | null,"contact_name": string,"contact_phone": string | null,"created_at": string,"id": string,"idea": string,"language": string,"placement": string | null,"pos_x": number | null,"pos_y": number | null,"reference_paths": (string)[],"size": Database["public"]['Enums']["tattoo_size"] | null,"size_cm": number | null,"status": Database["public"]['Enums']["request_status"],"style": string | null,"updated_at": string
+                    "artist_id": string,"body_view": string,"body_zone": string | null,"contact_email": string | null,"contact_instagram": string | null,"contact_name": string,"contact_phone": string | null,"created_at": string,"id": string,"idea": string,"language": string,"placement": string | null,"point": Json | null,"pos_x": number | null,"pos_y": number | null,"reference_paths": (string)[],"shape": string | null,"size": Database["public"]['Enums']["tattoo_size"] | null,"size_cm": number | null,"status": Database["public"]['Enums']["request_status"],"style": string | null,"updated_at": string
                   }
                   Insert: {
-                    "artist_id": string,"body_view"?: string,"body_zone"?: string | null,"contact_email"?: string | null,"contact_instagram"?: string | null,"contact_name": string,"contact_phone"?: string | null,"created_at"?: string,"id"?: string,"idea": string,"language"?: string,"placement"?: string | null,"pos_x"?: number | null,"pos_y"?: number | null,"reference_paths"?: (string)[],"size"?: Database["public"]['Enums']["tattoo_size"] | null,"size_cm"?: number | null,"status"?: Database["public"]['Enums']["request_status"],"style"?: string | null,"updated_at"?: string
+                    "artist_id": string,"body_view"?: string,"body_zone"?: string | null,"contact_email"?: string | null,"contact_instagram"?: string | null,"contact_name": string,"contact_phone"?: string | null,"created_at"?: string,"id"?: string,"idea": string,"language"?: string,"placement"?: string | null,"point"?: Json | null,"pos_x"?: number | null,"pos_y"?: number | null,"reference_paths"?: (string)[],"shape"?: string | null,"size"?: Database["public"]['Enums']["tattoo_size"] | null,"size_cm"?: number | null,"status"?: Database["public"]['Enums']["request_status"],"style"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "artist_id"?: string,"body_view"?: string,"body_zone"?: string | null,"contact_email"?: string | null,"contact_instagram"?: string | null,"contact_name"?: string,"contact_phone"?: string | null,"created_at"?: string,"id"?: string,"idea"?: string,"language"?: string,"placement"?: string | null,"pos_x"?: number | null,"pos_y"?: number | null,"reference_paths"?: (string)[],"size"?: Database["public"]['Enums']["tattoo_size"] | null,"size_cm"?: number | null,"status"?: Database["public"]['Enums']["request_status"],"style"?: string | null,"updated_at"?: string
+                    "artist_id"?: string,"body_view"?: string,"body_zone"?: string | null,"contact_email"?: string | null,"contact_instagram"?: string | null,"contact_name"?: string,"contact_phone"?: string | null,"created_at"?: string,"id"?: string,"idea"?: string,"language"?: string,"placement"?: string | null,"point"?: Json | null,"pos_x"?: number | null,"pos_y"?: number | null,"reference_paths"?: (string)[],"shape"?: string | null,"size"?: Database["public"]['Enums']["tattoo_size"] | null,"size_cm"?: number | null,"status"?: Database["public"]['Enums']["request_status"],"style"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -139,7 +139,7 @@ isOneToOne: false
           Functions: {
             "explore_works":
 { Args: { "p_before"?: string,"p_before_id"?: string,"p_limit"?: number,"p_q"?: string,"p_styles"?: (string)[],"p_vibes"?: (string)[] }; Returns: {
-              "artist_name": string,"artist_slug": string,"artist_studio": string,"caption": string,"created_at": string,"feel_color": number,"feel_detail": number,"feel_scale": number,"feel_weight": number,"height": number,"id": string,"image_path": string,"tags": (string)[],"thumb_path": string,"width": number
+              "artist_is_demo": boolean,"artist_name": string,"artist_slug": string,"artist_studio": string,"caption": string,"created_at": string,"feel_color": number,"feel_detail": number,"feel_scale": number,"feel_weight": number,"height": number,"id": string,"image_path": string,"tags": (string)[],"thumb_path": string,"width": number
             }[]
                            },
 "hit_rate":

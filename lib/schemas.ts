@@ -99,6 +99,12 @@ export const sketchRequest = z
     size_cm: z.number().int().min(1).max(60).nullish(),
     position: z.object({ x: z.number().min(0).max(200), y: z.number().min(0).max(420) }).nullish(),
     style: z.string().trim().toLowerCase().regex(SLUG_RE).nullish(),
+    // 3D body map: tapped point and surface normal in model space (figure is 1.7 m tall, facing +z)
+    point: z
+      .object({ x: z.number(), y: z.number(), z: z.number(), nx: z.number(), ny: z.number(), nz: z.number() })
+      .refine((p) => Object.values(p).every((v) => Math.abs(v) <= 2), "Point is off the body")
+      .nullish(),
+    shape: z.enum(["square", "tall", "wide"]).nullish(),
     contact_name: z.string().trim().min(1).max(80),
     contact_email: z.preprocess(blank, z.email().max(200).nullable()).optional(),
     contact_phone: phone.optional(),

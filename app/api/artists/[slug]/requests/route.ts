@@ -23,12 +23,18 @@ export const POST = route(async (request: Request, { params }: Ctx) => {
   // Look the artist up as the visitor so only approved artists can be messaged.
   const { data: a, error } = await (await createClient())
     .from("artists")
-    .select("id, display_name, status")
+    .select("id, display_name, status, is_demo")
     .eq("slug", slug.toLowerCase())
     .eq("status", "approved")
     .maybeSingle();
   check(error);
   if (!a) throw new HttpError(404, "Artist not found");
+
+  // Demo artists let visitors try the form; nothing is stored or sent.
+  if (a.is_demo) {
+    await removeIncoming(input.references);
+    return Response.json({ demo: true }, { status: 200 });
+  }
 
   const id = crypto.randomUUID();
   const stored: string[] = [];
@@ -51,6 +57,8 @@ export const POST = route(async (request: Request, { params }: Ctx) => {
       pos_x: input.position?.x ?? null,
       pos_y: input.position?.y ?? null,
       style: input.style ?? null,
+      point: input.point ?? null,
+      shape: input.shape ?? null,
       contact_name: input.contact_name,
       contact_email: input.contact_email ?? null,
       contact_phone: input.contact_phone ?? null,

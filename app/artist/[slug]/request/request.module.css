@@ -2,12 +2,17 @@
 .page { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 100vh; }
 .paper { background: var(--bone); color: var(--ink); padding: 4vh 3vw; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
 .hint { font-size: .9rem; opacity: .7; margin: 0 0 .6rem; }
-.fig { flex: 1; min-height: 0; width: 100%; touch-action: none; }
-.line * { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.zones ellipse { fill: transparent; stroke: var(--ink); stroke-width: .7; stroke-dasharray: 2 3; opacity: .35; }
-.zones ellipse.on { opacity: .9; fill: url(#hat); }
+.fig { flex: 1; min-height: 0; width: 100%; position: relative; cursor: grab; }
+.fig:active { cursor: grabbing; }
+.fig [data-body-btn], .shapes button { font: inherit; font-size: .85rem; color: var(--ink); background: var(--bone); border: 1px solid var(--ink); padding: .35rem .75rem; cursor: pointer; }
+.fig [data-body-btn][aria-pressed="true"], .shapes button[aria-pressed="true"] { background: var(--ink); color: var(--bone); }
+.fig [data-body-btn]:disabled { opacity: .35; cursor: default; }
+.controls { display: grid; gap: .5rem; margin-top: .4rem; }
+.shapes { display: flex; gap: .4rem; }
+.pick { display: flex; align-items: center; gap: .8rem; font-size: .9rem; }
+.pick select { flex: 1; font: inherit; background: transparent; color: var(--ink); border: 1px solid var(--ink); padding: .35rem .5rem; border-radius: 0; }
 .readout { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: .6rem; font-weight: 500; }
-.size { display: flex; align-items: center; gap: .8rem; margin-top: .4rem; font-size: .9rem; }
+.size { display: flex; align-items: center; gap: .8rem; font-size: .9rem; }
 .size input { flex: 1; accent-color: var(--ink); }
 
 .form { padding: 6vh 4vw 14vh; }

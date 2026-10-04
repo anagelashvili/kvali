@@ -29,7 +29,7 @@ export async function exploreWorks(supabase: Supabase, p: ExploreParams) {
   return {
     works: rows.map((r) => ({
       ...work(r),
-      artist: { slug: r.artist_slug, name: r.artist_name, studio: r.artist_studio },
+      artist: { slug: r.artist_slug, name: r.artist_name, studio: r.artist_studio, demo: r.artist_is_demo },
     })),
     next: rows.length === p.limit && last ? encodeCursor(last.created_at, last.id) : null,
   };

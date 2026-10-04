@@ -2,47 +2,18 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { Body3D, FALLBACK_ZONES, pieceSize, useWebGL, type Placement, type Shape } from "@/components/body-3d";
 import { uploadFile } from "@/lib/supabase/browser";
 import css from "./request.module.css";
 
 type Style = { slug: string; name: string };
 type Ref = { id: number; preview: string; path?: string; error?: string };
 
-// Body zones on the 200×420 figure, named from the wearer's point of view.
-// Hand-placed approximations from the prototype; replace with proper anatomy art.
-type Zone = { n: string; cx: number; cy: number; rx: number; ry: number };
-const ZONES: Zone[] = [
-  ...([
-    ["shoulder", 62, 86, 11, 11],
-    ["upper arm", 52, 118, 9, 22],
-    ["forearm", 43, 168, 8, 24],
-    ["thigh", 84, 262, 16, 36],
-    ["calf", 77, 342, 11, 34],
-    ["ankle", 70, 390, 8, 8],
-  ] as const).flatMap(([n, cx, cy, rx, ry]) => [
-    { n: `Right ${n}`, cx, cy, rx, ry },
-    { n: `Left ${n}`, cx: 200 - cx, cy, rx, ry },
-  ]),
-  { n: "Neck", cx: 100, cy: 62, rx: 13, ry: 10 },
-  { n: "Chest", cx: 100, cy: 100, rx: 26, ry: 20 },
-  { n: "Ribs and stomach", cx: 100, cy: 158, rx: 24, ry: 30 },
-  { n: "Hip", cx: 100, cy: 206, rx: 24, ry: 10 },
+const SHAPES: { id: Shape; label: string }[] = [
+  { id: "square", label: "Square" },
+  { id: "tall", label: "Tall" },
+  { id: "wide", label: "Wide" },
 ];
-
-const UNITS_PER_CM = 2.4; // on a ~170 cm figure
-
-function nearest(x: number, y: number) {
-  let best: Zone | null = null;
-  let d = Infinity;
-  for (const z of ZONES) {
-    const dz = ((x - z.cx) / z.rx) ** 2 + ((y - z.cy) / z.ry) ** 2;
-    if (dz < d) {
-      d = dz;
-      best = z;
-    }
-  }
-  return best!;
-}
 
 /** Splits "how to reach you" into the email / phone / Instagram field the API expects. */
 function contactFields(v: string) {
@@ -57,21 +28,22 @@ export function RequestForm({
   styles,
   initialStyle,
 }: {
-  artist: { slug: string; name: string; city: string; open: boolean };
+  artist: { slug: string; name: string; city: string; open: boolean; demo: boolean };
   styles: Style[];
   initialStyle: string | null;
 }) {
-  const fig = useRef<SVGSVGElement>(null);
-  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const webgl = useWebGL();
+  const [placement, setPlacement] = useState<Placement | null>(null);
+  const [zone, setZone] = useState<string | null>(null); // from the 3D map or the list
   const [cm, setCm] = useState(10);
-  const [dragging, setDragging] = useState(false);
+  const [shape, setShape] = useState<Shape>("square");
   const [idea, setIdea] = useState("");
   const [style, setStyle] = useState<string | null>(initialStyle);
   const [refs, setRefs] = useState<Ref[]>([]);
   const [name, setName] = useState("");
   const [reach, setReach] = useState("");
   const [honey, setHoney] = useState("");
-  const [state, setState] = useState<"brief" | "sending" | "sent">("brief");
+  const [state, setState] = useState<"brief" | "sending" | "sent" | "demo">("brief");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [message, setMessage] = useState("");
 
@@ -79,21 +51,19 @@ export function RequestForm({
   const previews = useRef<string[]>([]);
   useEffect(() => () => previews.current.forEach((u) => URL.revokeObjectURL(u)), []);
 
-  const zone = pos ? nearest(pos.x, pos.y) : null;
-  const w = cm * UNITS_PER_CM;
-  const h = w * 1.25;
-  const box = pos ? { x: pos.x - w / 2, y: pos.y - h / 2, w, h } : null;
+  const size = pieceSize(cm, shape);
   const uploading = refs.some((r) => !r.path && !r.error);
   const canSend =
-    state === "brief" && artist.open && !!pos && idea.trim().length >= 10 && name.trim() && reach.trim() && !uploading;
+    state === "brief" && artist.open && !!zone && idea.trim().length >= 10 && name.trim() && reach.trim() && !uploading;
 
-  function toSvg(e: React.PointerEvent) {
-    const svg = fig.current!;
-    const p = svg.createSVGPoint();
-    p.x = e.clientX;
-    p.y = e.clientY;
-    const q = p.matrixTransform(svg.getScreenCTM()!.inverse());
-    return { x: Math.max(0, Math.min(200, q.x)), y: Math.max(0, Math.min(420, q.y)) };
+  function place(p: Placement) {
+    setPlacement(p);
+    setZone(p.zone);
+    // spine pieces are long and narrow
+    if (/spine/i.test(p.zone) && shape === "square") {
+      setShape("tall");
+      if (cm < 18) setCm(24);
+    }
   }
 
   async function addFiles(files: FileList | null) {
@@ -126,10 +96,11 @@ export function RequestForm({
       body: JSON.stringify({
         idea,
         style,
-        placement: zone.n,
-        body_zone: zone.n,
+        placement: zone,
+        body_zone: zone,
         size_cm: cm,
-        position: { x: Math.round(pos!.x * 10) / 10, y: Math.round(pos!.y * 10) / 10 },
+        shape,
+        point: placement && placement.zone === zone ? placement.point : null,
         contact_name: name,
         ...contactFields(reach),
         language: "en",
@@ -139,7 +110,7 @@ export function RequestForm({
     });
     const data = await res.json().catch(() => ({}));
     if (res.ok) {
-      setState("sent");
+      setState(data.demo ? "demo" : "sent");
       return;
     }
     setState("brief");
@@ -149,86 +120,64 @@ export function RequestForm({
 
   const fieldError = (k: string) => errors[k]?.[0];
   const reachError = fieldError("contact_email") ?? fieldError("contact_phone") ?? fieldError("contact_instagram");
+  const done = state === "sent" || state === "demo";
 
   return (
     <div className={css.page}>
       <section className={css.paper}>
         <p className={css.hint}>
-          {state === "sent" ? "Your spot, saved with the request." : "Tap the body where you want it. Drag to move it around."}
+          {done ? "Your spot, saved with the request." : "Drag to turn the body. Tap where you want it, the back works too."}
         </p>
-        <svg
-          ref={fig}
-          className={css.fig}
-          viewBox="0 0 200 420"
-          role="img"
-          aria-label={zone ? `Body map, ${zone.n}, ${cm} cm` : "Body map"}
-          onPointerDown={(e) => {
-            if (state !== "brief") return;
-            e.currentTarget.setPointerCapture(e.pointerId);
-            setDragging(true);
-            setPos(toSvg(e));
-          }}
-          onPointerMove={(e) => dragging && setPos(toSvg(e))}
-          onPointerUp={() => setDragging(false)}
-          onPointerCancel={() => setDragging(false)}
-        >
-          <defs>
-            <pattern id="hat" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-              <line x1="0" y1="0" x2="0" y2="5" stroke="#0E0E0E" strokeWidth="1" />
-            </pattern>
-            <g id="half">
-              <path d="M92 55V72Q70 74 64 90Q62 130 62 160Q64 195 72 216L100 220" />
-              <path d="M64 90C50 94 46 108 44 124L34 190Q32 202 40 204Q50 205 53 194L64 135" />
-              <path d="M72 216L67 300Q65 335 69 382L65 404Q73 412 83 404L90 372Q96 320 100 285" />
-            </g>
-          </defs>
-          <g className={css.line}>
-            <circle cx="100" cy="34" r="22" />
-            <use href="#half" />
-            <use href="#half" transform="translate(200 0) scale(-1 1)" />
-          </g>
-          <g className={css.zones}>
-            {ZONES.map((z) => (
-              <ellipse key={z.n} cx={z.cx} cy={z.cy} rx={z.rx} ry={z.ry} className={zone === z ? css.on : undefined} />
-            ))}
-          </g>
-          {box && (
-            <g>
-              <rect x={box.x} y={box.y} width={box.w} height={box.h} fill="rgba(14,14,14,.1)" stroke="#0E0E0E" strokeWidth="1.6" strokeDasharray="4 3" />
-              <path
-                fill="none"
-                stroke="#0E0E0E"
-                strokeWidth="2.4"
-                d={(() => {
-                  const c = 5;
-                  const { x, y, w, h } = box;
-                  return `M${x} ${y + c}V${y}H${x + c}M${x + w - c} ${y}H${x + w}V${y + c}M${x} ${y + h - c}V${y + h}H${x + c}M${x + w - c} ${y + h}H${x + w}V${y + h - c}`;
-                })()}
-              />
-            </g>
-          )}
-        </svg>
-        <div className={css.readout}>
-          <span>{zone ? zone.n : "Tap to place"}</span>
-          <span>{pos ? `${cm} cm` : ""}</span>
+        <div className={css.fig}>
+          {webgl && <Body3D placement={placement} sizeCm={cm} shape={shape} disabled={state !== "brief"} onPlace={place} />}
         </div>
-        <label className={css.size}>
-          <span>Size</span>
-          <input type="range" min={3} max={30} value={cm} disabled={state !== "brief"} onChange={(e) => setCm(+e.target.value)} />
-        </label>
+        <div className={css.readout}>
+          <span>{zone ?? "Tap to place"}</span>
+          <span>{zone ? `${Math.round(size.w)} × ${Math.round(size.h)} cm` : ""}</span>
+        </div>
+        <div className={css.controls}>
+          <div className={css.shapes} role="group" aria-label="Shape">
+            {SHAPES.map((s) => (
+              <button type="button" key={s.id} aria-pressed={shape === s.id} disabled={state !== "brief"} onClick={() => setShape(s.id)}>
+                {s.label}
+              </button>
+            ))}
+          </div>
+          <label className={css.size}>
+            <span>Size</span>
+            <input type="range" min={3} max={45} value={cm} disabled={state !== "brief"} onChange={(e) => setCm(+e.target.value)} aria-label="Size, longest side in cm" />
+          </label>
+          <label className={css.pick}>
+            <span>{webgl === false ? "Where on the body?" : "Or pick a spot"}</span>
+            <select
+              value={zone && FALLBACK_ZONES.includes(zone) ? zone : ""}
+              disabled={state !== "brief"}
+              onChange={(e) => {
+                setZone(e.target.value || null);
+                setPlacement(null);
+              }}
+            >
+              <option value="">Choose…</option>
+              {FALLBACK_ZONES.map((z) => (
+                <option key={z}>{z}</option>
+              ))}
+            </select>
+          </label>
+        </div>
       </section>
 
       <section className={css.form}>
-        {state === "sent" ? (
+        {done ? (
           <div>
             <h1>
-              Sent to
+              {state === "demo" ? "That's the flow" : "Sent to"}
               <br />
-              {artist.name}
+              {state === "demo" ? "" : artist.name}
             </h1>
             <p className={css.to}>
-              {artist.name} will reply with a sketch through the contact you left. Nothing is booked until you approve
-              it.
+              {state === "demo"
+                ? `${artist.name} is a demo artist, so nothing was sent. With a real artist, they'd reply with a sketch through the contact you left.`
+                : `${artist.name} will reply with a sketch through the contact you left. Nothing is booked until you approve it.`}
             </p>
             <Link href="/explore" className={css.btn}>
               Back to the wall
@@ -249,6 +198,7 @@ export function RequestForm({
               To <b>{artist.name}</b>
               {style ? ` · ${styles.find((s) => s.slug === style)?.name}` : ""} · {artist.city}
             </p>
+            {artist.demo && <p className={css.note}>Demo artist: try the form, nothing will be sent.</p>}
             {!artist.open && <p className={css.error}>This artist isn&apos;t taking requests yet.</p>}
 
             <label className={css.f} htmlFor="idea">
@@ -311,7 +261,7 @@ export function RequestForm({
             <button className={css.go} disabled={!canSend}>
               {state === "sending" ? "Sending…" : uploading ? "Uploading images…" : `Send to ${artist.name}`}
             </button>
-            {!pos && <p className={css.note}>Place it on the body first.</p>}
+            {!zone && <p className={css.note}>Place it on the body first.</p>}
             {message && (
               <p className={css.error} role="alert">
                 {message}

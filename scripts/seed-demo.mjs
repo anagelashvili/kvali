@@ -1,10 +1,13 @@
-// Local-only demo data: approved artists whose works are the prototype's
-// generated ink art rendered to images. Never run against production.
+// Demo artists (flagged is_demo and labelled on the site; requests to them are
+// never stored) whose works are the prototype's generated ink art as images.
 //   node --env-file=.env.local scripts/seed-demo.mjs
+//   node --env-file=.env.vercel.local scripts/seed-demo.mjs --hosted   (the live database)
 import { createClient } from "@supabase/supabase-js";
 import sharp from "sharp";
 
-if (!/127\.0\.0\.1|localhost/.test(process.env.NEXT_PUBLIC_SUPABASE_URL)) throw new Error("seed-demo is for local Supabase only");
+if (!/127\.0\.0\.1|localhost/.test(process.env.NEXT_PUBLIC_SUPABASE_URL) && !process.argv.includes("--hosted")) {
+  throw new Error("Not a local database; pass --hosted to seed the live one");
+}
 const db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SECRET_KEY, { auth: { persistSession: false } });
 
 const STYLES = ["fine-line", "old-school", "blackwork", "japanese", "realism", "dotwork", "watercolor"];
@@ -38,9 +41,9 @@ for (const [name, studio, styleIdx] of ARTISTS) {
   if (!user) user = (await db.auth.admin.createUser({ email, email_confirm: true })).data.user;
   const slug = name.toLowerCase().replace(/\s+/g, "-");
   await db.from("works").delete().eq("artist_id", user.id);
-  await db.from("artists").upsert({ id: user.id, slug, display_name: name, studio, status: "approved",
+  await db.from("artists").upsert({ id: user.id, slug, display_name: name, studio, status: "approved", is_demo: true,
     instagram: slug.replace(/-/g, "."), price_from: 150 + Math.round(r() * 3) * 50, price_to: 600 + Math.round(r() * 6) * 100,
-    languages: ["ka", "en"], bio_en: `${studio}, Tbilisi. Books open for ${["spring", "autumn", "small pieces", "large projects"][Math.floor(r() * 4)]}.` });
+    languages: ["ka", "en"], bio_en: "Demo profile: generated sample work so you can try Kvali before real artists join." });
   for (let n = 0; n < 4; n++) {
     const si = styleIdx[n % 2];
     const png = await sharp(Buffer.from(art(si, seed++))).webp({ quality: 82 }).toBuffer();

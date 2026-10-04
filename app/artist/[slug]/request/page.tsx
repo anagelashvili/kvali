@@ -14,7 +14,7 @@ export default async function RequestPage({ params }: PageProps<"/artist/[slug]/
   const supabase = await createClient();
   const { data: artist } = await supabase
     .from("artists")
-    .select("id, slug, display_name, city, status")
+    .select("id, slug, display_name, city, status, is_demo")
     .eq("slug", slug.toLowerCase())
     .maybeSingle();
   if (!artist) notFound();
@@ -34,7 +34,7 @@ export default async function RequestPage({ params }: PageProps<"/artist/[slug]/
     <>
       <InkCursor />
       <RequestForm
-        artist={{ slug: artist.slug, name: artist.display_name, city: artist.city, open: artist.status === "approved" }}
+        artist={{ slug: artist.slug, name: artist.display_name, city: artist.city, open: artist.status === "approved", demo: artist.is_demo }}
         styles={styles}
         initialStyle={counts.size ? main : null}
       />

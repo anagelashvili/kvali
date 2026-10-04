@@ -63,6 +63,7 @@ export default async function Booth({ params }: PageProps<"/artist/[slug]">) {
           <span key={i}>{word}</span>
         ))}
       </h1>
+      {artist.demo && <p className={css.demo}>Demo artist · sample work while real Tbilisi artists join</p>}
       <p className={css.meta}>{meta}</p>
       {(artist.bio.en || artist.bio.ka) && <p className={css.bio}>{artist.bio.en ?? artist.bio.ka}</p>}
       <p className={css.links}>
