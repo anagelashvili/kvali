@@ -4,7 +4,7 @@
 A site where tattoo artists upload portfolios and visitors browse them by style and vibe (e.g. "traveler"). Flow: browse, filter, open an artist, send a short brief, artist replies with a sketch, visitor books. Launch focus: Tbilisi / Georgia. Languages: Georgian + English at minimum (Russian is common too). Business model undecided: leaning toward a small cut of booking deposits, with paid featured placement later.
 
 ## What exists
-`tbilisi-tattoo-gallery.html` is a single self-contained landing page (vanilla HTML/CSS/JS, no build step, Google Fonts only). It is a prototype of the opening experience, not the app.
+`index.html` is a single self-contained landing page (vanilla HTML/CSS/JS, no build step, Google Fonts only). It is a prototype of the opening experience, not the app.
 
 Sequence: white screen -> black dragon flies across and wipes it away -> hero -> statement (words light up on scroll) -> 7 style sections (Fine line, Old school, Blackwork, Japanese, Realism, Dotwork, Watercolor) separated by short "Next: ..." pauses -> how it works (3 steps) -> "Are you an artist?" -> pick-your-style chips + Explore button (placeholder).
 
