@@ -48,7 +48,7 @@ Landing sequence: white screen -> black dragon flies across and wipes it away ->
 - Data to persist per request: zone, size_cm, position, idea, style, reference images, artist, status (brief / sketch sent / approved / booked).
 
 ## Open design questions
-- Confirm the dragon illustration is licensed for commercial use, or commission one.
+- Dragon is parked as-is until a graphic designer joins. Brief for them: draw the dragon as separate animatable parts (head, a repeatable body section, tail, optional legs/fins) in the same line style, so the body can bend along the scroll path. Also confirm the current reference illustration is licensed for commercial use.
 - Back view and gender-neutral body shape for the body map.
 
 ## Backend (2026-10-04)
