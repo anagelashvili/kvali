@@ -4,7 +4,7 @@
 A site where tattoo artists upload portfolios and visitors browse them by style and vibe (e.g. "traveler"). Flow: browse, filter, open an artist, send a short brief, artist replies with a sketch, visitor books. Launch focus: Tbilisi / Georgia. Languages: Georgian + English at minimum (Russian is common too). Business model undecided: leaning toward a small cut of booking deposits, with paid featured placement later.
 
 ## What exists
-`index.html` is a single self-contained landing page (vanilla HTML/CSS/JS, no build step, Google Fonts only). It is a prototype of the opening experience, not the app.
+`public/landing.html` (served at `/`) is a single self-contained landing page (vanilla HTML/CSS/JS, no build step, Google Fonts only). It is a prototype of the opening experience, not the app.
 
 Sequence: white screen -> black dragon flies across and wipes it away -> hero -> statement (words light up on scroll) -> 7 style sections (Fine line, Old school, Blackwork, Japanese, Realism, Dotwork, Watercolor) separated by short "Next: ..." pauses -> how it works (3 steps) -> "Are you an artist?" -> pick-your-style chips + Explore button (placeholder).
 
@@ -30,3 +30,6 @@ Sequence: white screen -> black dragon flies across and wipes it away -> hero ->
 5. Onboard ~20-30 Tbilisi artists personally (import from Instagram with approval).
 6. Deposits: check which payment gateway works for Georgian merchants (verify, don't assume); launch with manual booking if needed.
 7. Performance pass on mobile for the landing animations.
+
+## Backend (2026-10-04)
+Next.js 16 + Supabase. Endpoints for explore/search, artist profiles, sketch requests, artist sign-in (email link or 6-digit code, Google once keys exist), profile editing, work uploads with tags, and the requests inbox. See `docs/API.md`. Pages under `app/login`, `app/join`, `app/dashboard` are bare placeholders until the design arrives. New artists start as `pending`; approve them in Supabase Studio for now.

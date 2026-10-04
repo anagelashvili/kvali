@@ -1,0 +1,4 @@
+/* Placeholder styles until the real design lands. */
+:root { --bg: #0e0e0e; --fg: #ede8dc; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: system-ui, sans-serif; }
