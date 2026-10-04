@@ -302,5 +302,15 @@ let last;
 for (let i = 0; i < 9; i++) last = await spammer("POST", "/api/auth/login", { email: `spam${i}-${run}@example.com` });
 ok(last.status === 429, "login is rate limited per IP", last.body);
 
+// ------------------------------------------------------------ clean up this run's accounts
+{
+  const { data } = await admin.auth.admin.listUsers({ perPage: 1000 });
+  for (const u of data.users.filter((u) => u.email?.endsWith(`-${run}@example.com`))) {
+    const { data: works } = await admin.from("works").select("image_path, thumb_path").eq("artist_id", u.id);
+    if (works?.length) await admin.storage.from("works").remove(works.flatMap((w) => [w.image_path, w.thumb_path]));
+    await admin.auth.admin.deleteUser(u.id);
+  }
+}
+
 console.log(failures ? `\n${failures} check(s) failed` : "\nAll checks passed");
 process.exit(failures ? 1 : 0);

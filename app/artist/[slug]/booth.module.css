@@ -1,7 +1,8 @@
 /* The artist booth, from the booth overlay in design/the-wall.html */
 .booth { min-height: 100vh; background: var(--bone); color: var(--ink); display: flow-root; }
 .close { position: fixed; left: 4vw; top: 2.5vh; z-index: 3; font: inherit; background: var(--ink); color: var(--bone); border: 0; padding: .6rem 1rem; text-decoration: none; }
-.name { font-family: var(--display); font-weight: 800; letter-spacing: -.035em; line-height: .9; font-size: clamp(5rem, 26vw, 24rem); white-space: nowrap; overflow: hidden; margin: 9vh -1.5vw 0; padding: 0 4vw; }
+.name { font-family: var(--display); font-weight: 800; letter-spacing: -.035em; line-height: .88; white-space: nowrap; overflow: hidden; margin: 11vh 0 0; padding: 0 4vw; }
+.name span { display: block; }
 .meta { padding: 1rem 4vw 0; font-size: 1.1rem; max-width: 40ch; margin: 0; }
 .bio { padding: 1rem 4vw 0; max-width: 60ch; line-height: 1.55; opacity: .8; margin: 0; }
 .links { padding: .8rem 4vw 0; margin: 0; font-size: .9rem; opacity: .7; }

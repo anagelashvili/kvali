@@ -54,7 +54,15 @@ export default async function Booth({ params }: PageProps<"/artist/[slug]">) {
       <Link href="/explore" className={css.close}>
         Close ×
       </Link>
-      <h1 className={css.name}>{artist.name}</h1>
+      <h1
+        className={css.name}
+        // one word per line, sized so the longest word just fits the width (Syne 800 ≈ 0.8em per letter)
+        style={{ fontSize: `min(24rem, calc(92vw / ${Math.max(4, ...artist.name.split(/\s+/).map((w) => [...w].length)) * 0.8}))` }}
+      >
+        {artist.name.split(/\s+/).map((word, i) => (
+          <span key={i}>{word}</span>
+        ))}
+      </h1>
       <p className={css.meta}>{meta}</p>
       {(artist.bio.en || artist.bio.ka) && <p className={css.bio}>{artist.bio.en ?? artist.bio.ka}</p>}
       <p className={css.links}>
