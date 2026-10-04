@@ -1,0 +1,21 @@
+/* The artist booth, from the booth overlay in design/the-wall.html */
+.booth { min-height: 100vh; background: var(--bone); color: var(--ink); display: flow-root; }
+.close { position: fixed; left: 4vw; top: 2.5vh; z-index: 3; font: inherit; background: var(--ink); color: var(--bone); border: 0; padding: .6rem 1rem; text-decoration: none; }
+.name { font-family: var(--display); font-weight: 800; letter-spacing: -.035em; line-height: .9; font-size: clamp(5rem, 26vw, 24rem); white-space: nowrap; overflow: hidden; margin: 9vh -1.5vw 0; padding: 0 4vw; }
+.meta { padding: 1rem 4vw 0; font-size: 1.1rem; max-width: 40ch; margin: 0; }
+.bio { padding: 1rem 4vw 0; max-width: 60ch; line-height: 1.55; opacity: .8; margin: 0; }
+.links { padding: .8rem 4vw 0; margin: 0; font-size: .9rem; opacity: .7; }
+.links a { color: inherit; }
+.works { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2.5rem; padding: 3rem 4vw 16vh; }
+.tile { position: relative; margin: 0; background: var(--ink); color: var(--bone); transform: rotate(var(--r)); }
+.tile::before { content: ""; position: absolute; top: -9px; left: 38%; width: 54px; height: 17px; background: rgba(14, 14, 14, .35); transform: rotate(-4deg); z-index: 1; }
+.tile:nth-child(2) { margin-top: 5rem; }
+.art { aspect-ratio: 3 / 4; overflow: hidden; margin: 10px 10px 0; }
+.art img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.tile figcaption { padding: .5rem .7rem .7rem; font-size: .8rem; display: flex; justify-content: space-between; gap: .5rem; }
+.tile figcaption b { font-weight: 500; }
+.req { position: fixed; right: 0; top: 50%; writing-mode: vertical-rl; transform: translateY(-50%) rotate(180deg); background: var(--ink); color: var(--bone); padding: 1.4rem .8rem; font-size: 1.05rem; text-decoration: none; z-index: 3; }
+
+@media (max-width: 700px) {
+  .tile:nth-child(2) { margin-top: 0; }
+}

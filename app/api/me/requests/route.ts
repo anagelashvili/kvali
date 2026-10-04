@@ -15,7 +15,7 @@ export const GET = route(async (request: Request) => {
 
   let list = supabase
     .from("requests")
-    .select("id, idea, placement, size, contact_name, language, status, created_at, reference_paths")
+    .select("id, idea, placement, size, body_zone, size_cm, style, contact_name, language, status, created_at, reference_paths")
     .eq("artist_id", user.id)
     .order("created_at", { ascending: false })
     .range(q.offset, q.offset + q.limit - 1);

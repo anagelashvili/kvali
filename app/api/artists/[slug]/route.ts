@@ -16,7 +16,7 @@ export const GET = route(async (_request: Request, { params }: Ctx) => {
 
   const { data: works, error: worksError } = await supabase
     .from("works")
-    .select("id, image_path, thumb_path, width, height, caption, created_at, work_tags(tag)")
+    .select("id, image_path, thumb_path, width, height, caption, created_at, feel_weight, feel_detail, feel_color, feel_scale, work_tags(tag)")
     .eq("artist_id", a.id)
     .eq("published", true)
     .order("position")

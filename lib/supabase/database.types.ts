@@ -51,13 +51,13 @@ export type Database = {
                   ]
                 },"requests": {
                   Row: {
-                    "artist_id": string,"contact_email": string | null,"contact_instagram": string | null,"contact_name": string,"contact_phone": string | null,"created_at": string,"id": string,"idea": string,"language": string,"placement": string | null,"reference_paths": (string)[],"size": Database["public"]['Enums']["tattoo_size"] | null,"status": Database["public"]['Enums']["request_status"],"updated_at": string
+                    "artist_id": string,"body_view": string,"body_zone": string | null,"contact_email": string | null,"contact_instagram": string | null,"contact_name": string,"contact_phone": string | null,"created_at": string,"id": string,"idea": string,"language": string,"placement": string | null,"pos_x": number | null,"pos_y": number | null,"reference_paths": (string)[],"size": Database["public"]['Enums']["tattoo_size"] | null,"size_cm": number | null,"status": Database["public"]['Enums']["request_status"],"style": string | null,"updated_at": string
                   }
                   Insert: {
-                    "artist_id": string,"contact_email"?: string | null,"contact_instagram"?: string | null,"contact_name": string,"contact_phone"?: string | null,"created_at"?: string,"id"?: string,"idea": string,"language"?: string,"placement"?: string | null,"reference_paths"?: (string)[],"size"?: Database["public"]['Enums']["tattoo_size"] | null,"status"?: Database["public"]['Enums']["request_status"],"updated_at"?: string
+                    "artist_id": string,"body_view"?: string,"body_zone"?: string | null,"contact_email"?: string | null,"contact_instagram"?: string | null,"contact_name": string,"contact_phone"?: string | null,"created_at"?: string,"id"?: string,"idea": string,"language"?: string,"placement"?: string | null,"pos_x"?: number | null,"pos_y"?: number | null,"reference_paths"?: (string)[],"size"?: Database["public"]['Enums']["tattoo_size"] | null,"size_cm"?: number | null,"status"?: Database["public"]['Enums']["request_status"],"style"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "artist_id"?: string,"contact_email"?: string | null,"contact_instagram"?: string | null,"contact_name"?: string,"contact_phone"?: string | null,"created_at"?: string,"id"?: string,"idea"?: string,"language"?: string,"placement"?: string | null,"reference_paths"?: (string)[],"size"?: Database["public"]['Enums']["tattoo_size"] | null,"status"?: Database["public"]['Enums']["request_status"],"updated_at"?: string
+                    "artist_id"?: string,"body_view"?: string,"body_zone"?: string | null,"contact_email"?: string | null,"contact_instagram"?: string | null,"contact_name"?: string,"contact_phone"?: string | null,"created_at"?: string,"id"?: string,"idea"?: string,"language"?: string,"placement"?: string | null,"pos_x"?: number | null,"pos_y"?: number | null,"reference_paths"?: (string)[],"size"?: Database["public"]['Enums']["tattoo_size"] | null,"size_cm"?: number | null,"status"?: Database["public"]['Enums']["request_status"],"style"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -66,6 +66,12 @@ export type Database = {
 isOneToOne: false
       referencedRelation: "artists"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "requests_style_fkey"
+      columns: ["style"]
+isOneToOne: false
+      referencedRelation: "tags"
+      referencedColumns: ["slug"]
     }
                   ]
                 },"tags": {
@@ -108,13 +114,13 @@ isOneToOne: false
                   ]
                 },"works": {
                   Row: {
-                    "artist_id": string,"caption": string | null,"created_at": string,"height": number,"id": string,"image_path": string,"position": number,"published": boolean,"thumb_path": string,"width": number
+                    "artist_id": string,"caption": string | null,"created_at": string,"feel_color": number | null,"feel_detail": number | null,"feel_scale": number | null,"feel_weight": number | null,"height": number,"id": string,"image_path": string,"position": number,"published": boolean,"thumb_path": string,"width": number
                   }
                   Insert: {
-                    "artist_id": string,"caption"?: string | null,"created_at"?: string,"height": number,"id"?: string,"image_path": string,"position"?: number,"published"?: boolean,"thumb_path": string,"width": number
+                    "artist_id": string,"caption"?: string | null,"created_at"?: string,"feel_color"?: number | null,"feel_detail"?: number | null,"feel_scale"?: number | null,"feel_weight"?: number | null,"height": number,"id"?: string,"image_path": string,"position"?: number,"published"?: boolean,"thumb_path": string,"width": number
                   }
                   Update: {
-                    "artist_id"?: string,"caption"?: string | null,"created_at"?: string,"height"?: number,"id"?: string,"image_path"?: string,"position"?: number,"published"?: boolean,"thumb_path"?: string,"width"?: number
+                    "artist_id"?: string,"caption"?: string | null,"created_at"?: string,"feel_color"?: number | null,"feel_detail"?: number | null,"feel_scale"?: number | null,"feel_weight"?: number | null,"height"?: number,"id"?: string,"image_path"?: string,"position"?: number,"published"?: boolean,"thumb_path"?: string,"width"?: number
                   }
                   Relationships: [
                     {
@@ -133,7 +139,7 @@ isOneToOne: false
           Functions: {
             "explore_works":
 { Args: { "p_before"?: string,"p_before_id"?: string,"p_limit"?: number,"p_q"?: string,"p_styles"?: (string)[],"p_vibes"?: (string)[] }; Returns: {
-              "artist_name": string,"artist_slug": string,"artist_studio": string,"caption": string,"created_at": string,"height": number,"id": string,"image_path": string,"tags": (string)[],"thumb_path": string,"width": number
+              "artist_name": string,"artist_slug": string,"artist_studio": string,"caption": string,"created_at": string,"feel_color": number,"feel_detail": number,"feel_scale": number,"feel_weight": number,"height": number,"id": string,"image_path": string,"tags": (string)[],"thumb_path": string,"width": number
             }[]
                            },
 "hit_rate":

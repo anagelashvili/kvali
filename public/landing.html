@@ -118,7 +118,6 @@ canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index
       <button aria-pressed="false">Realism</button><button aria-pressed="false">Dotwork</button><button aria-pressed="false">Watercolor</button><button aria-pressed="false">Lettering</button>
     </div>
     <button class="go" id="go">Explore the gallery</button>
-    <p id="note" hidden>Prototype: the filterable gallery is the next page to build.</p>
     <footer>Tbilisi, Georgia</footer>
   </div></section>
 
@@ -234,7 +233,11 @@ canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index
   document.getElementById("chips").addEventListener("click",function(e){
     var b=e.target.closest("button");if(b)b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true");
   });
-  document.getElementById("go").addEventListener("click",function(){document.getElementById("note").hidden=false});
+  document.getElementById("go").addEventListener("click",function(){
+    var picked=[].filter.call(document.querySelectorAll("#chips button"),function(b){return b.getAttribute("aria-pressed")==="true"}).map(function(b){return b.textContent.trim().toLowerCase().replace(/\s+/g,"-")});
+    location.href="/explore"+(picked.length?"?style="+picked.join(","):"");
+  });
+  [].forEach.call(document.querySelectorAll(".go:not(#go)"),function(b){b.addEventListener("click",function(){location.href="/login"})});
 })();
 </script>
 </body>

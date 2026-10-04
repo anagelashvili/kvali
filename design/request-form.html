@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Request a sketch: Tbilisi Tattoo Gallery</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Archivo:wght@400;500&display=swap">
+<style>
+:root{--ink:#0E0E0E;--bone:#EDE8DC;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:inherit}
+body{margin:0;background:var(--ink);color:var(--bone);font-family:Archivo,system-ui,sans-serif;overflow-x:hidden}
+h1,h2,.big{font-family:Syne,Arial,sans-serif;font-weight:800;letter-spacing:-.035em;line-height:.95;margin:0}
+.page{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:100vh}
+.paper{background:var(--bone);color:var(--ink);padding:4vh 3vw;position:sticky;top:0;height:100vh;display:flex;flex-direction:column}
+.paper .hint{font-size:.9rem;opacity:.7;margin:0 0 .6rem}
+#fig{flex:1;min-height:0;width:100%;touch-action:none}
+#fig .line *{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+#zones ellipse{fill:transparent;stroke:var(--ink);stroke-width:.7;stroke-dasharray:2 3;opacity:.35}
+#zones ellipse.on{opacity:.9;fill:url(#hat)}
+.readout{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:.6rem;font-weight:500}
+.size{display:flex;align-items:center;gap:.8rem;margin-top:.4rem;font-size:.9rem}
+.size input{flex:1}
+.form{padding:6vh 4vw 14vh}
+h1{font-size:clamp(2.6rem,7vw,6rem)}
+.to{margin:.8rem 0 2rem;opacity:.7}
+label.f{display:block;margin:1.6rem 0 .5rem;font-weight:500}
+textarea{width:100%;min-height:120px;background:transparent;color:inherit;border:1px solid var(--bone);padding:.8rem;font:inherit;resize:vertical;border-radius:0}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.chips button,.btn{font:inherit;color:inherit;background:none;border:1px solid currentColor;padding:.5rem .9rem;cursor:pointer;border-radius:0;transition:background .2s,color .2s}
+.chips button[aria-pressed=true]{background:var(--bone);color:var(--ink)}
+.drop{border:1px dashed var(--bone);padding:1.2rem;display:flex;flex-wrap:wrap;gap:1.2rem;align-items:center;min-height:120px;cursor:pointer}
+.drop input{display:none}
+.drop figure{margin:0;width:92px;background:var(--bone);padding:6px 6px 14px;transform:rotate(var(--r));position:relative}
+.drop figure:before{content:"";position:absolute;top:-8px;left:30%;width:36px;height:13px;background:rgba(237,232,220,.55)}
+.drop img{width:100%;aspect-ratio:1;object-fit:cover;display:block;filter:grayscale(1) contrast(1.1)}
+.go{display:block;margin-top:2.4rem;width:100%;font:inherit;font-size:1.15rem;background:var(--bone);color:var(--ink);border:0;padding:1.1rem;cursor:pointer}
+.go:disabled{opacity:.35;cursor:not-allowed}
+.sketch{display:none}
+.sketch p{max-width:36ch;line-height:1.5;opacity:.8}
+.sketch .rev{margin:2rem 0}
+.sketch .rev input{width:100%}
+.row{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1.5rem}
+.row .go{margin:0;width:auto;padding:1rem 1.6rem}
+.row .btn{padding:1rem 1.4rem}
+#toast{position:fixed;left:50%;bottom:6vh;transform:translateX(-50%);background:var(--bone);color:var(--ink);padding:.8rem 1.2rem;z-index:120;display:none}
+#grain{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:110;opacity:.1;mix-blend-mode:multiply}
+canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:95;mix-blend-mode:difference}
+.pen{position:fixed;left:0;top:0;z-index:100;pointer-events:none;color:#fff;mix-blend-mode:difference;display:none}
+.pen path{fill:#000;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
+@media(pointer:fine){body,button,textarea,input,.drop{cursor:none}.pen{display:block}}
+@media(max-width:800px){.page{grid-template-columns:1fr}.paper{position:relative;height:auto}#fig{height:62vh;flex:none}}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+</style>
+</head>
+<body>
+<canvas id="ink"></canvas>
+<svg class="pen" id="pen" width="56" height="56" viewBox="0 0 56 56" aria-hidden="true"><path d="M3 53L12 38L18 44Z"/><path d="M12 38L36 14L46 24L18 44Z"/><path d="M36 14L42 8L52 18L46 24Z"/></svg>
+<svg id="grain" aria-hidden="true"><filter id="n"><feTurbulence baseFrequency=".8" numOctaves="2"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>
+
+<div class="page">
+  <section class="paper">
+    <p class="hint" id="hint">Tap the body where you want it. Drag to move it around.</p>
+    <svg id="fig" viewBox="0 0 200 420" aria-label="Body map">
+      <defs>
+        <pattern id="hat" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="#0E0E0E" stroke-width="1"/></pattern>
+        <clipPath id="rev"><rect id="revr" x="0" y="0" width="0" height="0"/></clipPath>
+        <g id="half"><path d="M92 55V72Q70 74 64 90Q62 130 62 160Q64 195 72 216L100 220"/><path d="M64 90C50 94 46 108 44 124L34 190Q32 202 40 204Q50 205 53 194L64 135"/><path d="M72 216L67 300Q65 335 69 382L65 404Q73 412 83 404L90 372Q96 320 100 285"/></g>
+      </defs>
+      <g class="line"><circle cx="100" cy="34" r="22"/><use href="#half"/><use href="#half" transform="translate(200 0) scale(-1 1)"/></g>
+      <g id="zones"></g>
+      <g id="boxg"></g>
+    </svg>
+    <div class="readout"><span id="where">Tap to place</span><span id="cm"></span></div>
+    <div class="size"><span>Size</span><input type="range" id="sz" min="3" max="30" value="10"></div>
+  </section>
+
+  <section class="form">
+    <div id="brief">
+      <h1>Request<br>a sketch</h1>
+      <p class="to">To <b>Nino K.</b> · Old school · Tbilisi</p>
+      <label class="f" for="idea">What do you want?</label>
+      <textarea id="idea" placeholder="A compass with a swallow, a bit worn, like an old sailor tattoo."></textarea>
+      <label class="f">Style</label>
+      <div class="chips" id="chips"></div>
+      <label class="f">References</label>
+      <label class="drop" id="drop"><input type="file" id="file" accept="image/*" multiple><span id="dtxt">Drop images here or tap to add. They'll be pinned like tracing paper.</span></label>
+      <button class="go" id="send" disabled>Send to Nino K.</button>
+    </div>
+    <div class="sketch" id="sketch">
+      <h1 id="stitle">Nino is<br>sketching...</h1>
+      <div id="sbody" hidden>
+        <p>Here's the first sketch, placed on your body. Slide to see it appear.</p>
+        <div class="rev"><input type="range" id="rv" min="0" max="100" value="0" aria-label="Reveal sketch"></div>
+        <div class="row"><button class="go" id="ok">Approve and book</button><button class="btn" id="chg">Ask for changes</button></div>
+      </div>
+    </div>
+  </section>
+</div>
+<div id="toast"></div>
+
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+var S=["Fine line","Old school","Blackwork","Japanese","Realism","Dotwork","Watercolor"],si=1,stage="brief";
+function rng(s){return function(){s=(s*16807)%2147483647;return(s-1)/2147483646}}
+function art(si,seed){
+  var r=rng(seed*97+si*13+7),g="",f='<feGaussianBlur stdDeviation="0"/>',i,k,j,a;
+  if(si<4)f='<feTurbulence type="fractalNoise" baseFrequency=".02 .03" numOctaves="2" seed="'+seed+'"/><feDisplacementMap in="SourceGraphic" scale="'+[18,10,34,26][si]+'"/>';
+  if(si==0)for(i=0;i<5;i++)g+='<path fill="none" stroke-width="1.6" d="M'+(40+r()*60)+" "+(340-i*10)+"C"+r()*300+" "+r()*400+" "+r()*300+" "+r()*400+" "+(200+r()*80)+" "+(40+r()*80)+'"/>';
+  if(si==1)g='<circle cx="150" cy="190" r="'+(60+r()*40)+'" fill="none" stroke-width="14"/><path fill="none" stroke-width="12" d="M70 110L230 270M230 110L70 270"/>';
+  if(si==2)g='<circle cx="150" cy="190" r="'+(70+r()*50)+'"/><rect x="'+(60+r()*30)+'" y="320" width="'+(120+r()*60)+'" height="22"/><rect x="40" y="50" width="22" height="'+(120+r()*100)+'"/>';
+  if(si==3)for(i=0;i<6;i++)g+='<path fill="none" stroke-width="5" d="M10 '+(120+i*40)+"Q"+(75+r()*20)+" "+(60+i*40)+" 150 "+(120+i*40)+"T290 "+(120+i*40)+'"/>';
+  if(si==4||si==6){f='<feGaussianBlur stdDeviation="'+(si==4?14:24)+'"/>';for(i=0;i<4;i++)g+='<ellipse cx="'+(60+r()*180)+'" cy="'+(80+r()*240)+'" rx="'+(40+r()*60)+'" ry="'+(50+r()*70)+'" stroke="none" opacity="'+(si==4?.9:.45)+'"/>'}
+  if(si==5)for(k=1;k<=6;k++)for(j=0,a=k*8;j<a;j++)g+='<circle cx="'+(150+k*20*Math.cos(j/a*6.2832)).toFixed(1)+'" cy="'+(190+k*20*Math.sin(j/a*6.2832)).toFixed(1)+'" r="2.4" stroke="none"/>';
+  return'<defs><filter id="sf" x="-30%" y="-30%" width="160%" height="160%">'+f+'</filter></defs><g filter="url(#sf)" fill="#0E0E0E" stroke="#0E0E0E" stroke-linecap="round">'+g+"</g>"
+}
+/* body zones, named from the wearer's point of view */
+var Z=[],NS="http://www.w3.org/2000/svg",zg=$("zones");
+[["shoulder",62,86,11,11],["upper arm",52,118,9,22],["forearm",43,168,8,24],["thigh",84,262,16,36],["calf",77,342,11,34],["ankle",70,390,8,8]].forEach(function(z){
+  Z.push({n:"Right "+z[0],cx:z[1],cy:z[2],rx:z[3],ry:z[4]});Z.push({n:"Left "+z[0],cx:200-z[1],cy:z[2],rx:z[3],ry:z[4]})});
+[["Neck",100,62,13,10],["Chest",100,100,26,20],["Ribs and stomach",100,158,24,30],["Hip",100,206,24,10]].forEach(function(z){Z.push({n:z[0],cx:z[1],cy:z[2],rx:z[3],ry:z[4]})});
+Z.forEach(function(z){var e=document.createElementNS(NS,"ellipse");e.setAttribute("cx",z.cx);e.setAttribute("cy",z.cy);e.setAttribute("rx",z.rx);e.setAttribute("ry",z.ry);zg.appendChild(e);z.el=e});
+/* placement box */
+var fig=$("fig"),bg=$("boxg"),pos={x:100,y:100},cm=10,drag=false,placed=false;
+bg.innerHTML='<g id="sk" clip-path="url(#rev)"></g><rect id="bx" fill="rgba(14,14,14,.1)" stroke="#0E0E0E" stroke-width="1.6" stroke-dasharray="4 3"/><path id="cr" fill="none" stroke="#0E0E0E" stroke-width="2.4"/>';
+var bx=$("bx"),cr=$("cr"),sk=$("sk"),revr=$("revr");
+function geom(){var w=cm*2.4,h=w*1.25;return{x:pos.x-w/2,y:pos.y-h/2,w:w,h:h}}
+function draw(){
+  var g=geom(),near=null,best=1e9;
+  bx.setAttribute("x",g.x);bx.setAttribute("y",g.y);bx.setAttribute("width",g.w);bx.setAttribute("height",g.h);
+  var c=5;cr.setAttribute("d","M"+g.x+" "+(g.y+c)+"V"+g.y+"H"+(g.x+c)+"M"+(g.x+g.w-c)+" "+g.y+"H"+(g.x+g.w)+"V"+(g.y+c)+"M"+g.x+" "+(g.y+g.h-c)+"V"+(g.y+g.h)+"H"+(g.x+c)+"M"+(g.x+g.w-c)+" "+(g.y+g.h)+"H"+(g.x+g.w)+"V"+(g.y+g.h-c));
+  Z.forEach(function(z){var d=Math.pow((pos.x-z.cx)/z.rx,2)+Math.pow((pos.y-z.cy)/z.ry,2);z.el.classList.remove("on");if(d<best){best=d;near=z}});
+  if(placed&&near)near.el.classList.add("on");
+  $("where").textContent=placed&&near?near.n:"Tap to place";$("cm").textContent=placed?cm+" cm":"";
+  bx.style.display=cr.style.display=placed?"":"none";
+  revr.setAttribute("x",g.x);revr.setAttribute("y",g.y);revr.setAttribute("height",g.h);
+  sk.innerHTML=stage==="sketch"?'<svg x="'+g.x+'" y="'+g.y+'" width="'+g.w+'" height="'+g.h+'" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice">'+art(si,7)+"</svg>":"";
+  ready()
+}
+function pt(e){var p=fig.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(fig.getScreenCTM().inverse())}
+fig.addEventListener("pointerdown",function(e){if(stage!=="brief")return;drag=true;placed=true;var p=pt(e);pos.x=p.x;pos.y=p.y;draw()});
+addEventListener("pointermove",function(e){if(!drag)return;var p=pt(e);pos.x=p.x;pos.y=p.y;draw()});
+addEventListener("pointerup",function(){drag=false});
+$("sz").oninput=function(e){cm=+e.target.value;draw()};
+/* form */
+S.forEach(function(s,i){var b=document.createElement("button");b.textContent=s;b.setAttribute("aria-pressed",i==si);b.onclick=function(){si=i;[].forEach.call($("chips").children,function(c,j){c.setAttribute("aria-pressed",j==i)})};$("chips").appendChild(b)});
+function ready(){$("send").disabled=!(placed&&$("idea").value.trim().length>2)}
+$("idea").oninput=ready;
+$("file").onchange=function(e){
+  var d=$("drop");[].slice.call(d.querySelectorAll("figure")).forEach(function(f){f.remove()});
+  [].slice.call(e.target.files,0,4).forEach(function(f,i){var fg=document.createElement("figure");fg.style.setProperty("--r",(i%2?3:-3)+"deg");fg.innerHTML='<img alt="Reference '+(i+1)+'">';fg.firstChild.src=URL.createObjectURL(f);d.appendChild(fg)});
+  $("dtxt").style.display=e.target.files.length?"none":""
+};
+$("send").onclick=function(){
+  stage="sketch";$("brief").style.display="none";$("sketch").style.display="block";$("hint").textContent="Your sketch, on your body.";
+  $("sz").disabled=true;draw();
+  setTimeout(function(){$("stitle").innerHTML="Sketch<br>is in";$("sbody").hidden=false},1800)
+};
+function setRev(v){var g=geom();revr.setAttribute("width",g.w*v/100)}
+$("rv").oninput=function(e){setRev(e.target.value)};
+var _d=draw;draw=function(){_d();setRev($("rv").value)};
+function toast(t){var el=$("toast");el.textContent=t;el.style.display="block";setTimeout(function(){el.style.display="none"},2400)}
+$("ok").onclick=function(){toast("Next: pick a date and leave a deposit")};
+$("chg").onclick=function(){toast("Next: write what to change, the artist replies with a new sketch")};
+draw();
+
+var cv=$("ink"),ctx=cv.getContext("2d"),pen=$("pen"),last=null,w,h;
+function size(){var d=devicePixelRatio||1;w=innerWidth;h=innerHeight;cv.width=w*d;cv.height=h*d;ctx.setTransform(d,0,0,d,0,0)}
+size();addEventListener("resize",size);
+addEventListener("pointermove",function(e){
+  var x=e.clientX,y=e.clientY,j=last?(Math.random()-.5)*1.4:0;
+  pen.style.transform="translate("+(x-3+j)+"px,"+(y-53+j)+"px)";
+  if(last){var sp=Math.hypot(x-last.x,y-last.y);ctx.strokeStyle="#fff";ctx.lineWidth=Math.max(1.5,6-sp*.06);ctx.lineCap="round";ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(x,y);ctx.stroke()}
+  last={x:x,y:y}
+});
+document.addEventListener("mouseleave",function(){last=null});
+(function fade(){ctx.globalCompositeOperation="destination-out";ctx.fillStyle="rgba(0,0,0,.04)";ctx.fillRect(0,0,w,h);ctx.globalCompositeOperation="source-over";requestAnimationFrame(fade)})();
+})();
+</script>
+</body>
+</html>

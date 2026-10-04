@@ -32,6 +32,7 @@ export function artist(a: ArtistRow, { own = false } = {}) {
 type WorkRow = {
   id: string; image_path: string; thumb_path: string; width: number; height: number; caption: string | null;
   position?: number; published?: boolean; created_at: string; work_tags?: { tag: string }[]; tags?: string[];
+  feel_weight?: number | null; feel_detail?: number | null; feel_color?: number | null; feel_scale?: number | null;
 };
 
 export function work(w: WorkRow, { own = false } = {}) {
@@ -43,6 +44,12 @@ export function work(w: WorkRow, { own = false } = {}) {
     height: w.height,
     caption: w.caption,
     tags: (w.tags ?? w.work_tags?.map((t) => t.tag) ?? []).sort(),
+    feel: {
+      weight: w.feel_weight ?? null,
+      detail: w.feel_detail ?? null,
+      color: w.feel_color ?? null,
+      scale: w.feel_scale ?? null,
+    },
     created_at: w.created_at,
     ...(own ? { position: w.position, published: w.published } : {}),
   };

@@ -5,7 +5,8 @@ import { remove } from "@/lib/storage";
 
 type Ctx = { params: Promise<{ id: string }> };
 
-const COLUMNS = "id, image_path, thumb_path, width, height, caption, position, published, created_at, work_tags(tag)";
+const COLUMNS =
+  "id, image_path, thumb_path, width, height, caption, position, published, created_at, feel_weight, feel_detail, feel_color, feel_scale, work_tags(tag)";
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 async function workId(params: Ctx["params"]) {
@@ -18,7 +19,8 @@ async function workId(params: Ctx["params"]) {
 export const PATCH = route(async (request: Request, { params }: Ctx) => {
   const id = await workId(params);
   const { supabase, user } = await requireArtist();
-  const { tags, ...fields } = await readBody(request, updateWork);
+  const { tags, feel, ...rest } = await readBody(request, updateWork);
+  const fields = { ...rest, ...feel };
 
   const { data: existing, error } = await supabase
     .from("works")

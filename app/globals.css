@@ -1,4 +1,23 @@
-/* Placeholder styles until the real design lands. */
-:root { --bg: #0e0e0e; --fg: #ede8dc; }
-* { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: system-ui, sans-serif; }
+:root {
+  --ink: #0e0e0e;
+  --bone: #ede8dc;
+  --display: var(--font-syne), "Helvetica Neue", Arial, sans-serif;
+  --body: var(--font-archivo), system-ui, sans-serif;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+*, *::before, *::after { box-sizing: inherit; }
+body { margin: 0; background: var(--ink); color: var(--bone); font-family: var(--body); overflow-x: hidden; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+/* ink cursor, shared by every page that renders <InkCursor /> */
+.ink-trail { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 95; mix-blend-mode: difference; }
+.grain { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 110; opacity: .1; mix-blend-mode: multiply; }
+.pen { position: fixed; left: 0; top: 0; z-index: 100; pointer-events: none; color: #fff; mix-blend-mode: difference; display: none; will-change: transform; }
+.pen path { fill: #000; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+@media (pointer: fine) {
+  body:has(.pen), body:has(.pen) button, body:has(.pen) a, body:has(.pen) input, body:has(.pen) figure { cursor: none; }
+  .pen { display: block; }
+}

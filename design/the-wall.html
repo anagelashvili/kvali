@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Wall: Tbilisi Tattoo Gallery</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Archivo:wght@400;500&display=swap">
+<style>
+:root{--ink:#0E0E0E;--bone:#EDE8DC;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:inherit}
+body{margin:0;background:var(--ink);color:var(--bone);font-family:Archivo,system-ui,sans-serif;overflow-x:hidden}
+h1,.name{font-family:Syne,Arial,sans-serif;font-weight:800;letter-spacing:-.035em;line-height:.9;margin:0}
+header{padding:5vh 4vw 2vh}
+.logo{font-size:.9rem;opacity:.65}
+h1{font-size:clamp(3.4rem,14vw,12rem)}
+header p{margin:.8rem 0 0;max-width:34ch;line-height:1.5;opacity:.7}
+.ctrl{position:sticky;top:0;z-index:20;background:var(--ink);padding:1rem 4vw;border-bottom:1px solid rgba(237,232,220,.25)}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.chips button,.clear{font:inherit;color:inherit;background:none;border:1px solid currentColor;padding:.45rem .9rem;cursor:pointer;transition:background .2s,color .2s}
+.chips button[aria-pressed=true]{background:var(--bone);color:var(--ink)}
+.sl{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.6rem 2rem;margin-top:1rem}
+.sl label{display:block;font-size:.8rem;opacity:.75}
+.sl label span{display:flex;justify-content:space-between}
+input[type=range]{width:100%;accent-color:var(--bone);cursor:inherit}
+.count{margin-top:.8rem;font-size:.85rem;opacity:.65;display:flex;justify-content:space-between;align-items:center}
+.wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(140px,18vw,220px),1fr));gap:4.5rem 3rem;padding:3.5rem 5vw 14vh}
+.tile{position:relative;background:var(--bone);color:var(--ink);margin:0;transform:rotate(var(--r));transition:transform .25s,opacity .4s,filter .4s;cursor:pointer}
+.tile:before{content:"";position:absolute;top:-9px;left:38%;width:54px;height:17px;background:rgba(237,232,220,.5);transform:rotate(-4deg)}
+.tile .a{aspect-ratio:3/4;overflow:hidden;margin:10px 10px 0}
+.tile svg{width:100%;height:100%;display:block}
+.tile figcaption{padding:.5rem .7rem .7rem;font-size:.8rem;display:flex;justify-content:space-between;gap:.5rem}
+.tile figcaption b{font-weight:500}
+.tile:hover{transform:scale(1.1) rotate(0);z-index:5}
+.tile.ghost{opacity:.14;filter:grayscale(1);pointer-events:none;transform:scale(.94) rotate(var(--r))}
+#booth{position:fixed;inset:0;z-index:80;background:var(--bone);color:var(--ink);overflow-y:auto;display:none}
+#booth.on{display:block}
+.close{position:fixed;left:4vw;top:2.5vh;z-index:3;font:inherit;background:var(--ink);color:var(--bone);border:0;padding:.6rem 1rem;cursor:pointer}
+.name{font-size:clamp(5rem,26vw,24rem);white-space:nowrap;overflow:hidden;margin:9vh -1.5vw 0;padding:0 4vw}
+.meta{padding:1rem 4vw;font-size:1.1rem;max-width:40ch}
+.works{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2.5rem;padding:2rem 4vw 16vh}
+.works .tile{margin:0;background:var(--ink);color:var(--bone)}
+.works .tile:nth-child(2){margin-top:5rem}
+.req{position:fixed;right:0;top:50%;writing-mode:vertical-rl;transform:rotate(180deg) translateX(0);background:var(--ink);color:var(--bone);border:0;padding:1.4rem .8rem;font:inherit;font-size:1.05rem;cursor:pointer;z-index:3}
+#toast{position:fixed;left:50%;bottom:6vh;transform:translateX(-50%);background:var(--bone);color:var(--ink);padding:.8rem 1.2rem;z-index:120;display:none}
+#grain{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:110;opacity:.1;mix-blend-mode:multiply}
+canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:95;mix-blend-mode:difference}
+.pen{position:fixed;left:0;top:0;z-index:100;pointer-events:none;color:#fff;mix-blend-mode:difference;display:none}
+.pen path{fill:#000;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
+@media(pointer:fine){body,button,.tile,input{cursor:none}.pen{display:block}}
+button:focus-visible,input:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+</style>
+</head>
+<body>
+<canvas id="ink"></canvas>
+<svg class="pen" id="pen" width="56" height="56" viewBox="0 0 56 56" aria-hidden="true"><path d="M3 53L12 38L18 44Z"/><path d="M12 38L36 14L46 24L18 44Z"/><path d="M36 14L42 8L52 18L46 24Z"/></svg>
+<svg id="grain" aria-hidden="true"><filter id="n"><feTurbulence baseFrequency=".8" numOctaves="2"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>
+
+<header><span class="logo">Tbilisi Tattoo Gallery</span><h1>The wall</h1><p>Describe the feeling. The wall rearranges. Tap a piece to meet the artist.</p></header>
+<div class="ctrl">
+  <div class="chips" id="chips"></div>
+  <div class="sl" id="sl"></div>
+  <div class="count"><span id="count"></span><button class="clear" id="clear">Clear</button></div>
+</div>
+<main class="wall" id="wall"></main>
+
+<div id="booth"><button class="close" id="close">Close ×</button><div class="name" id="bname"></div><p class="meta" id="bmeta"></p><div class="works" id="works"></div><button class="req" id="req">Request a sketch</button></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+var S=["Fine line","Old school","Blackwork","Japanese","Realism","Dotwork","Watercolor"];
+var P=[[.15,.2,.05,.2],[.7,.5,.8,.5],[.85,.7,0,.7],[.8,.95,.7,.95],[.5,.6,.3,.7],[.4,.8,0,.5],[.2,.4,.95,.5]];
+var N=["Nino K.","Luka M.","Tamar B.","Giorgi D.","Mariam S.","Sandro T.","Elene R.","Dato G.","Salome P."];
+var SL=[["Delicate","Aggressive"],["Minimal","Ornate"],["Black ink","Color"],["Small","Huge"]];
+function rng(s){return function(){s=(s*16807)%2147483647;return(s-1)/2147483646}}
+function art(si,seed){
+  var r=rng(seed*97+si*13+7),u="k"+si+"_"+seed,g="",f='<feGaussianBlur stdDeviation="0"/>',i,k,j,a;
+  if(si<4)f='<feTurbulence type="fractalNoise" baseFrequency=".02 .03" numOctaves="2" seed="'+seed+'"/><feDisplacementMap in="SourceGraphic" scale="'+[18,10,34,26][si]+'"/>';
+  if(si==0)for(i=0;i<5;i++)g+='<path fill="none" stroke-width="1.6" d="M'+(40+r()*60)+" "+(340-i*10)+"C"+r()*300+" "+r()*400+" "+r()*300+" "+r()*400+" "+(200+r()*80)+" "+(40+r()*80)+'"/>';
+  if(si==1)g='<circle cx="150" cy="190" r="'+(60+r()*40)+'" fill="none" stroke-width="14"/><path fill="none" stroke-width="12" d="M70 110L230 270M230 110L70 270"/>';
+  if(si==2)g='<circle cx="150" cy="190" r="'+(70+r()*50)+'"/><rect x="'+(60+r()*30)+'" y="320" width="'+(120+r()*60)+'" height="22"/><rect x="40" y="50" width="22" height="'+(120+r()*100)+'"/>';
+  if(si==3)for(i=0;i<6;i++)g+='<path fill="none" stroke-width="5" d="M10 '+(120+i*40)+"Q"+(75+r()*20)+" "+(60+i*40)+" 150 "+(120+i*40)+"T290 "+(120+i*40)+'"/>';
+  if(si==4||si==6){f='<feGaussianBlur stdDeviation="'+(si==4?14:24)+'"/>';for(i=0;i<4;i++)g+='<ellipse cx="'+(60+r()*180)+'" cy="'+(80+r()*240)+'" rx="'+(40+r()*60)+'" ry="'+(50+r()*70)+'" stroke="none" opacity="'+(si==4?.9:.45)+'"/>'}
+  if(si==5)for(k=1;k<=6;k++)for(j=0,a=k*8;j<a;j++)g+='<circle cx="'+(150+k*20*Math.cos(j/a*6.2832)).toFixed(1)+'" cy="'+(190+k*20*Math.sin(j/a*6.2832)).toFixed(1)+'" r="2.4" stroke="none"/>';
+  return'<svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><filter id="'+u+'" x="-30%" y="-30%" width="160%" height="160%">'+f+'</filter></defs><g filter="url(#'+u+')" fill="currentColor" stroke="currentColor" stroke-linecap="round">'+g+"</g></svg>"
+}
+var pieces=[],rr=rng(11),id=0;
+S.forEach(function(s,si){for(var n=0;n<3;n++){pieces.push({id:id,si:si,artist:N[(id*4+si)%9],v:P[si].map(function(x){return Math.max(0,Math.min(1,x+(rr()-.5)*.3))}),r:((rr()*6)-3).toFixed(1)});id++}});
+var wall=document.getElementById("wall"),chips=document.getElementById("chips"),sl=document.getElementById("sl"),sel={},touched={},vals=[.5,.5,.5,.5];
+pieces.forEach(function(p){var t=document.createElement("figure");t.className="tile";t.style.cssText="--r:"+p.r+"deg;z-index:"+(id-p.id);t.innerHTML='<div class="a">'+art(p.si,p.id)+"</div><figcaption><b>"+p.artist+"</b><span>"+S[p.si]+"</span></figcaption>";t.onclick=function(){openBooth(p)};p.el=t;wall.appendChild(t)});
+S.forEach(function(s,i){var b=document.createElement("button");b.textContent=s;b.setAttribute("aria-pressed","false");b.onclick=function(){sel[i]=!sel[i];b.setAttribute("aria-pressed",!!sel[i]);run()};chips.appendChild(b)});
+SL.forEach(function(l,i){var d=document.createElement("label");d.innerHTML="<span><i>"+l[0]+"</i><i>"+l[1]+'</i></span><input type="range" min="0" max="100" value="50">';d.querySelector("input").oninput=function(e){vals[i]=e.target.value/100;touched[i]=true;run()};sl.appendChild(d)});
+document.getElementById("clear").onclick=function(){sel={};touched={};[].forEach.call(chips.children,function(b){b.setAttribute("aria-pressed","false")});[].forEach.call(sl.querySelectorAll("input"),function(x){x.value=50});run()};
+function run(){
+  var any=Object.keys(sel).some(function(k){return sel[k]}),tk=Object.keys(touched),shown=0;
+  pieces.forEach(function(p){
+    var ok=!any||sel[p.si],sc=1;
+    if(tk.length)sc=tk.reduce(function(a,k){return a+1-Math.abs(vals[k]-p.v[k])},0)/tk.length;
+    p.sc=ok?sc:0;p.ok=ok&&sc>=.68
+  });
+  pieces.slice().sort(function(a,b){return b.sc-a.sc}).forEach(function(p,i){p.el.style.order=i;p.el.classList.toggle("ghost",!p.ok);if(p.ok)shown++});
+  document.getElementById("count").textContent=shown+" of "+pieces.length+" pieces"
+}
+run();
+var booth=document.getElementById("booth"),toast=document.getElementById("toast");
+function openBooth(p){
+  document.getElementById("bname").textContent=p.artist;
+  document.getElementById("bmeta").textContent=S[p.si]+" · Tbilisi · Replies in about a day";
+  document.getElementById("works").innerHTML=[0,1,2].map(function(n){return'<figure class="tile" style="--r:'+(n-1)*2+'deg"><div class="a">'+art(p.si,p.id*5+n+40)+"</div><figcaption><b>"+p.artist+"</b><span>"+S[p.si]+"</span></figcaption></figure>"}).join("");
+  booth.classList.add("on");booth.scrollTop=0;document.body.style.overflow="hidden"
+}
+document.getElementById("close").onclick=function(){booth.classList.remove("on");document.body.style.overflow=""};
+document.getElementById("req").onclick=function(){toast.textContent="Next page: tap a body map to place and size your tattoo";toast.style.display="block";setTimeout(function(){toast.style.display="none"},2600)};
+
+var cv=document.getElementById("ink"),ctx=cv.getContext("2d"),pen=document.getElementById("pen"),last=null,w,h;
+function size(){var d=devicePixelRatio||1;w=innerWidth;h=innerHeight;cv.width=w*d;cv.height=h*d;ctx.setTransform(d,0,0,d,0,0)}
+size();addEventListener("resize",size);
+addEventListener("pointermove",function(e){
+  var x=e.clientX,y=e.clientY,j=last?(Math.random()-.5)*1.4:0;
+  pen.style.transform="translate("+(x-3+j)+"px,"+(y-53+j)+"px)";
+  if(last){var sp=Math.hypot(x-last.x,y-last.y);ctx.strokeStyle="#fff";ctx.lineWidth=Math.max(1.5,6-sp*.06);ctx.lineCap="round";ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(x,y);ctx.stroke()}
+  last={x:x,y:y}
+});
+document.addEventListener("mouseleave",function(){last=null});
+(function fade(){ctx.globalCompositeOperation="destination-out";ctx.fillStyle="rgba(0,0,0,.04)";ctx.fillRect(0,0,w,h);ctx.globalCompositeOperation="source-over";requestAnimationFrame(fade)})();
+})();
+</script>
+</body>
+</html>

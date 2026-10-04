@@ -25,6 +25,10 @@ Sketch request body:
   "idea": "A small mountain line on my forearm",   // 10–2000 chars
   "placement": "forearm",                          // optional
   "size": "small",                                 // tiny | small | medium | large | xl, optional
+  "body_zone": "Right forearm",                    // from the body map, optional
+  "size_cm": 8,                                    // 1–60, optional
+  "position": { "x": 43.2, "y": 168.5 },           // point on the 200×420 front-view map, optional
+  "style": "fine-line",                            // style tag slug, optional
   "contact_name": "Giorgi",
   "contact_email": "g@example.com",                // at least one of email / phone / instagram
   "contact_phone": "+995 555 12 34 56",
@@ -57,8 +61,8 @@ Limited to 5 requests per hour per visitor. The artist gets an email (needs `RES
 | POST | `/api/me/avatar` `{ path }` | Sets the profile picture (cropped to 400×400) |
 | DELETE | `/api/me/avatar` | Removes it |
 | GET | `/api/me/works` | All own works including unpublished, in portfolio order |
-| POST | `/api/me/works` `{ path, caption?, tags?, published? }` | Adds a work at the front of the portfolio. Up to 8 tag slugs. |
-| PATCH | `/api/me/works/:id` `{ caption?, tags?, published? }` | `tags` replaces the whole set |
+| POST | `/api/me/works` `{ path, caption?, tags?, feel?, published? }` | Adds a work at the front of the portfolio. Up to 8 tag slugs. `feel` is the wall's four sliders, each 0–100 or null: `{ weight, detail, color, scale }` (delicate→aggressive, minimal→ornate, black ink→color, small→huge). |
+| PATCH | `/api/me/works/:id` `{ caption?, tags?, feel?, published? }` | `tags` replaces the whole set |
 | DELETE | `/api/me/works/:id` | Deletes the work and its files |
 | PUT | `/api/me/works/order` `{ ids }` | New portfolio order; must list every work once |
 | GET | `/api/me/requests?status=new&limit=50&offset=0` | Inbox, newest first, with `counts` per status |

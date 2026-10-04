@@ -59,15 +59,27 @@ const tagList = z
   .max(8)
   .transform((t) => [...new Set(t)]);
 
+// The wall's sliders, 0–100 between two poles; null = not set.
+const pole = z.number().int().min(0).max(100).nullable();
+export const feel = z
+  .object({ weight: pole, detail: pole, color: pole, scale: pole })
+  .partial()
+  .transform((f) =>
+    Object.fromEntries(Object.entries(f).map(([k, v]) => [`feel_${k}`, v])) as Partial<
+      Record<"feel_weight" | "feel_detail" | "feel_color" | "feel_scale", number | null>
+    >,
+  );
+
 export const createWork = z.object({
   path: z.string(),
   caption: text(300).optional(),
   tags: tagList.default([]),
+  feel: feel.optional(),
   published: z.boolean().default(true),
 });
 
 export const updateWork = z
-  .object({ caption: text(300), tags: tagList, published: z.boolean() })
+  .object({ caption: text(300), tags: tagList, feel, published: z.boolean() })
   .partial();
 
 export const reorderWorks = z.object({ ids: z.array(z.uuid()).min(1).max(500) });
@@ -82,6 +94,11 @@ export const sketchRequest = z
     idea: z.string().trim().min(10, "Tell the artist a bit more").max(2000),
     placement: text(60).optional(),
     size: z.enum(SIZES).nullish(),
+    // body map: zone name as shown to the visitor, size in cm, point on the front view
+    body_zone: text(40).optional(),
+    size_cm: z.number().int().min(1).max(60).nullish(),
+    position: z.object({ x: z.number().min(0).max(200), y: z.number().min(0).max(420) }).nullish(),
+    style: z.string().trim().toLowerCase().regex(SLUG_RE).nullish(),
     contact_name: z.string().trim().min(1).max(80),
     contact_email: z.preprocess(blank, z.email().max(200).nullable()).optional(),
     contact_phone: phone.optional(),
@@ -117,7 +134,7 @@ export const exploreQuery = z.object({
   vibe: csv,
   q: z.string().trim().max(80).optional(),
   cursor: z.string().max(200).optional(),
-  limit: z.coerce.number().int().min(1).max(60).default(30),
+  limit: z.coerce.number().int().min(1).max(120).default(30),
 });
 
 export const artistQuery = z.object({

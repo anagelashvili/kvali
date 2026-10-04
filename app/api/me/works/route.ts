@@ -5,7 +5,8 @@ import { createWork } from "@/lib/schemas";
 import { put, readIncoming, remove, removeIncoming } from "@/lib/storage";
 import { createAdminClient } from "@/lib/supabase/server";
 
-const COLUMNS = "id, image_path, thumb_path, width, height, caption, position, published, created_at, work_tags(tag)";
+const COLUMNS =
+  "id, image_path, thumb_path, width, height, caption, position, published, created_at, feel_weight, feel_detail, feel_color, feel_scale, work_tags(tag)";
 
 // GET /api/me/works — all of the artist's work, including unpublished, in portfolio order.
 export const GET = route(async () => {
@@ -53,6 +54,7 @@ export const POST = route(async (request: Request) => {
       width: full.width,
       height: full.height,
       caption: input.caption ?? null,
+      ...input.feel,
       published: input.published,
       position: (first?.position ?? 1) - 1,
     });
