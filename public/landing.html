@@ -9,7 +9,7 @@
 :root{--bg:#0E0E0E;--fg:#EDE8DC;--dim:rgba(237,232,220,.62);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:inherit}
-body{margin:0;background:var(--bg);color:var(--fg);font-family:Archivo,system-ui,sans-serif;overflow-x:hidden;transition:background .9s ease,color .9s ease}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:Archivo,system-ui,sans-serif;overflow-x:hidden;transition:color .45s ease}
 body[data-mood=bone]{--bg:#EDE8DC;--fg:#0E0E0E;--dim:rgba(14,14,14,.62)}
 h1,h2,h3,.say,.step b{font-family:Syne,"Helvetica Neue",Arial,sans-serif;font-weight:800;font-style:normal;margin:0;line-height:.98;letter-spacing:-.035em}
 h1{font-size:clamp(2.8rem,9.5vw,8rem)}
@@ -193,11 +193,24 @@ html.intro{overflow:hidden}
   };
   var stages=[].slice.call(document.querySelectorAll(".stage")),tick=false;
   var clamp=function(v){return Math.max(0,Math.min(1,v))};
+  // The background follows the scroll: while the next section's top travels from 80% to 20% of the
+  // screen, ink and bone blend into each other. Text flips once, at the midpoint (eased by CSS), so it
+  // never fades into a background of the same grey.
+  var INK=[14,14,14],BONE=[237,232,220],blendFrom=null,blendTo=null,blendT=0;
+  function mix(a,b,t){return a.map(function(v,i){return Math.round(v+(b[i]-v)*t)})}
+  function paint(from,to,t){
+    var e=t*t*(3-2*t),bg=mix(from==="bone"?BONE:INK,to==="bone"?BONE:INK,e),fg=(e<.5?from:to)==="bone"?INK:BONE,st=document.body.style;
+    st.setProperty("--bg","rgb("+bg+")");st.setProperty("--fg","rgb("+fg+")");st.setProperty("--dim","rgba("+fg+",.62)");
+    document.body.dataset.mood=e<.5?from:to;
+  }
   function update(){
     tick=false;var vh=innerHeight,mood=stages[0].dataset.mood;
-    stages.forEach(function(s){
+    blendFrom=blendTo=null;
+    stages.forEach(function(s,i){
       var r=s.getBoundingClientRect();
       if(r.top<vh*.5)mood=s.dataset.mood;
+      var prev=stages[i-1];
+      if(prev&&prev.dataset.mood!==s.dataset.mood&&r.top<vh*.8&&r.top>vh*.2){blendFrom=prev.dataset.mood;blendTo=s.dataset.mood;blendT=(vh*.8-r.top)/(vh*.6)}
       var span=r.height-vh;if(span<=0)return;
       var p=clamp(-r.top/span)-.5;
       if(V[s.dataset.v])V[s.dataset.v](s,clamp((p+.5)/.85));
@@ -205,7 +218,7 @@ html.intro{overflow:hidden}
         f.style.transform="translateY("+(-p*f.dataset.s*3)+"px) rotate("+(p*(i-1)*6)+"deg)";
       });
     });
-    document.body.dataset.mood=mood;
+    if(blendFrom)paint(blendFrom,blendTo,blendT);else paint(mood,mood,0);
     var sy=document.getElementById("say"),ws=sy._w,r1=sy.getBoundingClientRect(),n1=Math.floor(clamp(-r1.top/(r1.height-vh))*1.2*ws.length);
     ws.forEach(function(w,i){w.style.opacity=i<=n1?1:.15});
     var hw=document.getElementById("how"),r2=hw.getBoundingClientRect(),p2=clamp(-r2.top/(r2.height-vh));
