@@ -16,7 +16,7 @@ Landing sequence: white screen -> black dragon flies across and wipes it away ->
 - Strictly monochrome: ink black (#0E0E0E) and bone (#EDE8DC); background flips between them per section.
 - Fonts: Syne (headlines, weight 800) + Archivo (body). Blackletter was tried and rejected as unreadable; Bodoni and Anton were rejected as too plain.
 - Cursor is a tattoo machine that leaves a fading ink trail (desktop only). Ink, pen and dragon use mix-blend-mode: difference so they read on white, ink and bone.
-- A Japanese-style dragon follows the scroll down the page. It fades out during artwork sections so it never covers the tattoos, and returns in the pauses. Dragon path is a generated polyline; head is a hand-drawn SVG (weakest part visually, a real illustration would be better).
+- A Japanese-style dragon follows the scroll down the page. It fades out during artwork sections so it never covers the tattoos, and returns in the pauses. Since 2026-10-04 it is a line illustration (`public/dragon.png`, extracted from `design/dragon-reference.png`): it inks in head-first during the intro, then swings side to side on scroll, turning to face the content.
 - Each style section uses a different scroll mechanic so it doesn't get repetitive: drift, horizontal slide, zoom-through, card stack, pen spotlight. Effects finish at ~85% of the section and hold.
 - Frames currently hold generated abstract ink-wash placeholders (SVG feTurbulence). Replace with real artist photos, with the artists' permission. Do not use scraped Pinterest images.
 
@@ -48,7 +48,7 @@ Landing sequence: white screen -> black dragon flies across and wipes it away ->
 - Data to persist per request: zone, size_cm, position, idea, style, reference images, artist, status (brief / sketch sent / approved / booked).
 
 ## Open design questions
-- Dragon head is the weakest drawing; get a real illustration.
+- Confirm the dragon illustration is licensed for commercial use, or commission one.
 - Back view and gender-neutral body shape for the body map.
 
 ## Backend (2026-10-04)

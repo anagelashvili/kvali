@@ -15,7 +15,7 @@
 .sliders input { width: 100%; accent-color: var(--bone); cursor: inherit; }
 .count { margin-top: .8rem; font-size: .85rem; opacity: .65; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
 
-.wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18vw, 220px), 1fr)); gap: 4.5rem 3rem; padding: 3.5rem 5vw 14vh; }
+.wall { isolation: isolate; display: grid; grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18vw, 220px), 1fr)); gap: 4.5rem 3rem; padding: 3.5rem 5vw 14vh; }
 .tile { display: block; text-decoration: none; position: relative; background: var(--bone); color: var(--ink); margin: 0; transform: rotate(var(--r)); transition: transform .25s, opacity .4s, filter .4s; cursor: pointer; }
 .tile::before { content: ""; position: absolute; top: -9px; left: 38%; width: 54px; height: 17px; background: rgba(237, 232, 220, .5); transform: rotate(-4deg); z-index: 1; }
 .art { aspect-ratio: 3 / 4; overflow: hidden; margin: 10px 10px 0; }
