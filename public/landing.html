@@ -151,18 +151,27 @@ html.intro{overflow:hidden}
       cv.width=W*dpr;cv.height=vh*dpr;
       var H=docH=document.documentElement.scrollHeight,footTop=foot?foot.getBoundingClientRect().top+scrollY:H;
       L=Math.max(380,Math.min(W*.75,vh*1.1,860));        // on-screen length, head to tail
-      y0=vh*.72;pts=[];var len=0,x,y,xs=-L-80,xe=W*.86;
+      // The route is a series of gentle diagonal passes across the screen. Every pass starts and ends a
+      // full body length past the edge, and the turns between passes happen out there, so on screen it
+      // only ever flies straight through: out one side, back in lower down going the other way.
+      var M=L+80,xl=-M,xr=W+M,r=vh*.07,len=0,y,d=1;
+      y0=vh*.72;pts=[];
       function push(x,y){var q=pts[pts.length-1];if(q)len+=Math.hypot(x-q.x,y-q.y);pts.push({x:x,y:y,l:len})}
-      for(x=xs;x<=xe;x+=6){var u=(x-xs)/(xe-xs);push(x,y0+60*Math.sin(u*8)*(1-u))}
-      introIdx=pts.length-1;introLen=len;
-      var A=W*.32,ph0=Math.acos(Math.max(-1,Math.min(1,(xe-W*.5)/A)));
-      // down the page, until just above the footer…
-      var yRun=footTop+vh*.3,R=L*.32,t,P,dir,e,xEnd;
-      for(y=y0+6;y<=yRun-R;y+=6)push(W*.5+A*Math.cos(ph0+(y-y0)/(vh*1.15)*Math.PI*2),y);
-      sinIdx=pts.length-1;sinEnd=len;P=pts[sinIdx];dir=P.x<W*.5?1:-1;e={x:P.x+dir*R,y:yRun};
-      // …then a wide turn and a level glide above the wordmark, where it comes to rest
-      for(t=.04;t<=1.001;t+=.04)push((1-t)*(1-t)*P.x+2*(1-t)*t*P.x+t*t*e.x,(1-t)*(1-t)*P.y+2*(1-t)*t*yRun+t*t*e.y);
-      xEnd=dir>0?W*.9:W*.1;for(x=e.x+dir*6;dir*(xEnd-x)>0;x+=dir*6)push(x,yRun+16*Math.sin((x-e.x)/110));
+      function pass(d,y,drop,amp,until){
+        var xa=d>0?xl:xr,xb=d>0?xr:xl,n=Math.ceil(Math.abs(xb-xa)/6),x,u,i;
+        for(i=pts.length?1:0;i<=n;i++){u=i/n;x=xa+(xb-xa)*u;if(until&&d*(x-until.x)>0)return;push(x,y+drop*u+amp*Math.sin(u*Math.PI*3));if(until&&until.mark&&d*(x-until.mark)>=0&&!until.at)until.at=pts.length-1}
+      }
+      function turn(d,y){var X=d>0?xr:xl,t;for(t=.06;t<=Math.PI+1e-6;t+=.06)push(X+d*r*Math.sin(t),y+r*(1-Math.cos(t)))}
+      // intro pass: in from the left across the white screen, pausing on the right
+      var mark={mark:W*.8};pass(1,y0,vh*.16,vh*.012,mark);
+      introIdx=mark.at;introLen=pts[introIdx].l;y=y0+vh*.16;
+      // down the page, one crossing per screen of scrolling, until just above the footer
+      var yRest=footTop+vh*.3,drop=vh*.95;
+      while(y+2*r+drop<yRest-2*r){turn(d,y);y+=2*r;d=-d;pass(d,y,drop,vh*.03);y+=drop}
+      // last entrance: in from off screen, easing down into a level glide above the wordmark
+      turn(d,y);y+=2*r;d=-d;sinIdx=pts.length-1;sinEnd=len;
+      var xa=d>0?xl:xr,xEnd=d>0?W*.9:W*.1,n=Math.ceil(Math.abs(xEnd-xa)/6),i,u,fall=Math.max(0,yRest-y);
+      for(i=1;i<=n;i++){u=i/n;push(xa+(xEnd-xa)*u,y+fall*(1-Math.pow(1-u,2))+14*Math.sin(u*Math.PI*2))}
       spans=art.map(function(a){var r=a.getBoundingClientRect();return [r.top+scrollY,r.bottom+scrollY]});
       render();
     }
